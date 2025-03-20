@@ -20,21 +20,10 @@ module.exports = {
             res.status(500).json({ error: `Internal server error: ${error.message}` });
         }
     },
-    getMindmapEmail: async (req, res) => {
-        try {
-            const mindmap = await Mindmap.findById(req.params.email);
-            if (!mindmap) {
-                res.status(404).json({ error: 'Mindmap not found by id ' + req.params.email });
-            }
-            res.status(200).json(mindmap);
-        } catch (error) {
-            res.status(500).json({ error: `Internal server error: ${error.message}` });
-        }
-    },
     addMindmap: async (req, res) => {
         try {
-            const { email, password, Mindmapname } = req.body;
-            const mindmap = new Mindmap({ email, password, Mindmapname });
+            const { title, description, owner } = req.body;
+            const mindmap = new Mindmap({ title, description, owner });
             await mindmap.save();
             res.status(201).json(mindmap);
         } catch (error) {
@@ -43,7 +32,7 @@ module.exports = {
     },
     updateMindmap: async (req, res) => {
         try {
-            const mindmap = Mindmap.findByIdAndUpdate(req.params.id, req.body, { new: true });
+            const mindmap = await Mindmap.findByIdAndUpdate(req.params.id, req.body, { new: true });
             if (!mindmap) {
                 res.status(404).json({ error: 'Mindmap not found by id ' + req.params.id });
             }
@@ -54,7 +43,7 @@ module.exports = {
     },
     deleteMindmap: async (req, res) => {
         try {
-            const mindmap = Mindmap.findByIdAndDelete(req.params.id);
+            const mindmap = await Mindmap.findByIdAndDelete(req.params.id);
             if (!mindmap) {
                 return res.status(404).json({ error: "Mindmap not found" });
             }
@@ -63,4 +52,6 @@ module.exports = {
             res.status(500).json({ error: `Internal server error: ${error.message}` });
         }
     }
+    // all mindmaps that user has access to
+    // all mindmaps that user owns
 };

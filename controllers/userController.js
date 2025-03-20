@@ -13,7 +13,7 @@ module.exports = {
         try {
             const user = await User.findById(req.params.id);
             if (!user) {
-                res.status(404).json({ error: 'User not found by id ' + req.params.id });
+                return res.status(404).json({ error: 'User not found by id ' + req.params.id });
             }
             res.status(200).json(user);
         } catch (error) {
@@ -22,9 +22,9 @@ module.exports = {
     },
     getUserEmail: async (req, res) => {
         try {
-            const user = await User.findById(req.params.email);
+            const user = await User.findOne({ email: req.params.email });
             if (!user) {
-                res.status(404).json({ error: 'User not found by id ' + req.params.email });
+                return res.status(404).json({ error: 'User not found by email ' + req.params.email });
             }
             res.status(200).json(user);
         } catch (error) {
@@ -43,9 +43,9 @@ module.exports = {
     },
     updateUser: async (req, res) => {
         try {
-            const user = User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+            const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
             if (!user) {
-                res.status(404).json({ error: 'User not found by id ' + req.params.id });
+                return res.status(404).json({ error: 'User not found by id ' + req.params.id });
             }
             res.status(200).json(user);
         } catch (error) {
@@ -54,7 +54,7 @@ module.exports = {
     },
     deleteUser: async (req, res) => {
         try {
-            const user = User.findByIdAndDelete(req.params.id);
+            const user = await User.findByIdAndDelete(req.params.id);
             if (!user) {
                 return res.status(404).json({ error: "User not found" });
             }

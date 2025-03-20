@@ -4,12 +4,12 @@ const Schema = mongoose.Schema;
 
 const participantSchema = new Schema({
     mindmap: {
-        type: Schema.Type.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "Mindmap",
         required: true
     },
     user: {
-        type: Schema.Type.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: "User",
         required: true
     },
