@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
-
 const Schema = mongoose.Schema;
 
-const mindmapSchema = new Schema({
+const mindmapSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true
@@ -23,8 +22,15 @@ const mindmapSchema = new Schema({
         type: Date,
         default: Date.now
     }
+}, {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
 });
 
-const Mindmap = mongoose.model("Mindmap", mindmapSchema);
+mindmapSchema.virtual('participants', {
+    ref: 'Participant',
+    localField: '_id',
+    foreignField: 'mindmap'
+});
 
-module.exports = Mindmap;
+module.exports = mongoose.model("Mindmap", mindmapSchema);

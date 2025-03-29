@@ -1,7 +1,7 @@
 require("dotenv").config();
 const config = require("./config");
 const routes = require("./routes");
-
+const cors = require("cors");
 const express = require("express");
 const { WebSocketServer } = require("ws");
 const Y = require("yjs");
@@ -26,11 +26,31 @@ const host = config.ip;
 const port = config.port;
 const wsPort = process.env.WS_PORT;
 
+// CORS Configuration
+app.use(cors({
+    origin: ['http://localhost:5173', 'http://localhost:3000'], // Add your React app's URLs
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type']
+}));
+
 const wss = new WebSocketServer({ host, port: wsPort });
 
 wss.on("connection", (ws, req) => {
+    console.log("New WebSocket connection");
+
+    ws.on('error', (error) => {
+        console.error('WebSocket error:', error);
+    });
+
     setupWSConnection(ws, req);
+
+    ws.on('close', () => {
+        console.log(`WebSocket connection closed`);
+    });
 });
+
+
+
 
 app.use(express.json());
 app.use(routes);

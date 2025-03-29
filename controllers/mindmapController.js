@@ -1,10 +1,74 @@
-const Mindmap = require('../models/mindmap');
+const db = require('../models');
+
+const Mindmap = db.Mindmap;
+const Participant = db.Participant;
 
 module.exports = {
     getAllMindmaps: async (req, res) => {
         try {
-            const mindmaps = await Mindmap.find();
-            res.status(200).json(mindmaps);
+
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 10;
+            // lastModified, createdAt
+            const { ownerId, participantUserId, sortBy = 'lastModified', order = 'desc' } = req.query;
+
+            const sortOptions = {
+                [sortBy]: order === 'desc' ? -1 : 1
+            };
+
+            const skip = (page - 1) * limit;
+
+            let query = {};
+            if (ownerId && participantUserId) {
+                const participantEntries = await Participant.find({ user: participantUserId }).select('mindmap');
+
+                const participantMindmapIds = participantEntries.map(entry => entry.mindmap);
+
+                query.$or = [
+                    { owner: ownerId },
+                    { _id: { $in: participantMindmapIds } }
+                ];
+            } else {
+                if (ownerId) {
+                    query.owner = ownerId;
+                }
+
+                if (participantUserId) {
+                    const participantEntries = await Participant.find({ user: participantUserId }).select('mindmap');
+
+                    const participantMindmapIds = participantEntries.map(entry => entry.mindmap);
+
+                    query._id = { $in: participantMindmapIds };
+                }
+            }
+
+            const mindmaps = await db.Mindmap.find(query)
+                .sort(sortOptions)
+                .skip(skip)
+                .limit(limit)
+                .populate({
+                    path: 'participants',
+                    model: 'Participant',
+                    populate: {
+                        path: 'user',
+                        model: 'User',
+                        select: 'username email' // Select only specific user fields
+                    }
+                });
+
+            const totalMindmaps = await Mindmap.countDocuments(query);
+
+            const totalPages = Math.ceil(totalMindmaps / limit);
+
+            res.status(200).json({
+                mindmaps,
+                pagination: {
+                    currentPage: page,
+                    totalPages,
+                    totalMindmaps,
+                    itemsPerPage: limit
+                }
+            });
         } catch (error) {
             res.status(500).json({ error: `Internal server error: ${error.message}` });
         }

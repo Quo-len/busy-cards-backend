@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
-
 const Schema = mongoose.Schema;
 
-const participantSchema = new Schema({
+const participantSchema = new mongoose.Schema({
     mindmap: {
         type: Schema.Types.ObjectId,
         ref: "Mindmap",
@@ -24,6 +23,4 @@ const participantSchema = new Schema({
     }
 });
 
-const Participant = mongoose.model("Participant", participantSchema);
-
-module.exports = Participant;
+module.exports = mongoose.model("Participant", participantSchema);

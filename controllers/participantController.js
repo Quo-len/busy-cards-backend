@@ -1,15 +1,21 @@
-const Participant = require('../models/participant');
-const Mindmap = require('../models/mindmap');
-const User = require('../models/user');
+const db = require('../models');
+
+const Participant = db.Participant;
+const User = db.User;
+const Mindmap = db.Mindmap;
 
 module.exports = {
     getAllParticipants: async (req, res) => {
         try {
-            const { mindmapId } = req.params;
+            const mindmapId = req.query.mindmapId;
+            const participantId = req.query.participantId;
 
             let filter = {};
             if (mindmapId) {
                 filter.mindmap = mindmapId;
+            }
+            if (participantId) {
+                filter.user = participantId;
             }
 
             const participants = await Participant.find(filter);

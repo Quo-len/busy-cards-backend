@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const Mindmap = require('./mindmap');
-
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
@@ -30,11 +28,4 @@ const UserSchema = new Schema({
     lastLogin: Date
 });
 
-UserSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
-    await Mindmap.deleteMany({ userId: this._id });
-    next();
-});
-
-const User = mongoose.model("User", UserSchema);
-
-module.exports = User;
+module.exports = mongoose.model("User", UserSchema);
