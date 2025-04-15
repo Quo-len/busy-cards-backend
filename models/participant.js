@@ -2,22 +2,22 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const participantSchema = new mongoose.Schema({
-    mindmap: {
+    mindmapId: {
         type: Schema.Types.ObjectId,
         ref: "Mindmap",
         required: true
     },
-    user: {
+    userId: {
         type: Schema.Types.ObjectId,
         ref: "User",
         required: true
     },
     accessLevel: {
         type: String,
-        enum: ['owner', 'editor', 'commenter', 'viewer'],
+        enum: ['Редактор', 'Коментатор', 'Глядач'],
         required: true
     },
-    sharedAt: {
+    joinedAt: {
         type: Date,
         default: Date.now
     }

@@ -9,7 +9,7 @@ const mindmapSchema = new mongoose.Schema({
     description: {
         type: String,
     },
-    owner: {
+    ownerId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
