@@ -46,9 +46,10 @@ module.exports = {
 	},
 	updateUser: async (req, res) => {
 		try {
-			const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+			const userId = req.user.id;
+			const user = await User.findByIdAndUpdate(userId, req.body, { new: true });
 			if (!user) {
-				return res.status(404).json({ error: 'User not found by id ' + req.params.id });
+				return res.status(404).json({ error: 'User not found by id ' + userId });
 			}
 			res.status(200).json(user);
 		} catch (error) {

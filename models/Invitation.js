@@ -2,17 +2,17 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const invitationSchema = new mongoose.Schema({
-	senderId: {
+	sender: {
 		type: Schema.Types.ObjectId,
 		ref: 'Mindmap',
 		required: true,
 	},
-	receiverId: {
+	receiver: {
 		type: Schema.Types.ObjectId,
 		ref: 'User',
 		required: false,
 	},
-	mindmapId: {
+	mindmap: {
 		type: Schema.Types.ObjectId,
 		ref: 'Mindmap',
 		required: true,

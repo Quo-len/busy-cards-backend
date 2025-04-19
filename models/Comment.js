@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const tagSchema = new mongoose.Schema({
-	mindmapId: {
+	mindmap: {
 		type: Schema.Types.ObjectId,
 		ref: 'Mindmap',
 		required: true,
 	},
-	writerId: {
+	writer: {
 		type: Schema.Types.ObjectId,
 		ref: 'User',
 		required: true,

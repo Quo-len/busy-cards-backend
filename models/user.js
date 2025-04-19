@@ -25,7 +25,7 @@ const UserSchema = new Schema({
 		type: Date,
 		default: Date.now,
 	},
-	info: {
+	about: {
 		type: String,
 		default: 'No information',
 	},

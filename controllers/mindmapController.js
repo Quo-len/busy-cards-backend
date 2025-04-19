@@ -4,118 +4,114 @@ const Mindmap = db.Mindmap;
 const Participant = db.Participant;
 
 module.exports = {
-    getAllMindmaps: async (req, res) => {
-        try {
+	getAllMindmaps: async (req, res) => {
+		try {
+			const page = parseInt(req.query.page) || 1;
+			const limit = parseInt(req.query.limit) || 10;
+			// lastModified, createdAt
+			const { owner, participantUserId, sortBy = 'lastModified', order = 'desc' } = req.query;
 
-            const page = parseInt(req.query.page) || 1;
-            const limit = parseInt(req.query.limit) || 10;
-            // lastModified, createdAt
-            const { ownerId, participantUserId, sortBy = 'lastModified', order = 'desc' } = req.query;
+			const sortOptions = {
+				[sortBy]: order === 'desc' ? -1 : 1,
+			};
 
-            const sortOptions = {
-                [sortBy]: order === 'desc' ? -1 : 1
-            };
+			const skip = (page - 1) * limit;
 
-            const skip = (page - 1) * limit;
+			let query = {};
+			if (owner && participantUserId) {
+				const participantEntries = await Participant.find({ user: participantUserId }).select('mindmap');
 
-            let query = {};
-            if (ownerId && participantUserId) {
-                const participantEntries = await Participant.find({ user: participantUserId }).select('mindmap');
+				const participantMindmapIds = participantEntries.map((entry) => entry.mindmap);
 
-                const participantMindmapIds = participantEntries.map(entry => entry.mindmap);
+				query.$or = [{ owner }, { _id: { $in: participantMindmapIds } }];
+			} else {
+				if (owner) {
+					query.owner = owner;
+				}
 
-                query.$or = [
-                    { owner: ownerId },
-                    { _id: { $in: participantMindmapIds } }
-                ];
-            } else {
-                if (ownerId) {
-                    query.owner = ownerId;
-                }
+				if (participantUserId) {
+					const participantEntries = await Participant.find({ user: participantUserId }).select('mindmap');
 
-                if (participantUserId) {
-                    const participantEntries = await Participant.find({ user: participantUserId }).select('mindmap');
+					const participantMindmapIds = participantEntries.map((entry) => entry.mindmap);
 
-                    const participantMindmapIds = participantEntries.map(entry => entry.mindmap);
+					query._id = { $in: participantMindmapIds };
+				}
+			}
 
-                    query._id = { $in: participantMindmapIds };
-                }
-            }
+			const mindmaps = await db.Mindmap.find(query)
+				.sort(sortOptions)
+				.skip(skip)
+				.limit(limit)
+				.populate({
+					path: 'participants',
+					model: 'Participant',
+					populate: {
+						path: 'user',
+						model: 'User',
+						select: 'username email', // Select only specific user fields
+					},
+				});
 
-            const mindmaps = await db.Mindmap.find(query)
-                .sort(sortOptions)
-                .skip(skip)
-                .limit(limit)
-                .populate({
-                    path: 'participants',
-                    model: 'Participant',
-                    populate: {
-                        path: 'user',
-                        model: 'User',
-                        select: 'username email' // Select only specific user fields
-                    }
-                });
+			const totalMindmaps = await Mindmap.countDocuments(query);
 
-            const totalMindmaps = await Mindmap.countDocuments(query);
+			const totalPages = Math.ceil(totalMindmaps / limit);
 
-            const totalPages = Math.ceil(totalMindmaps / limit);
-
-            res.status(200).json({
-                mindmaps,
-                pagination: {
-                    currentPage: page,
-                    totalPages,
-                    totalMindmaps,
-                    itemsPerPage: limit
-                }
-            });
-        } catch (error) {
-            res.status(500).json({ error: `Internal server error: ${error.message}` });
-        }
-    },
-    getMindmap: async (req, res) => {
-        try {
-            const mindmap = await Mindmap.findById(req.params.id);
-            if (!mindmap) {
-                res.status(404).json({ error: 'Mindmap not found by id ' + req.params.id });
-            }
-            res.status(200).json(mindmap);
-        } catch (error) {
-            res.status(500).json({ error: `Internal server error: ${error.message}` });
-        }
-    },
-    addMindmap: async (req, res) => {
-        try {
-            const { title, description, owner } = req.body;
-            const mindmap = new Mindmap({ title, description, owner });
-            await mindmap.save();
-            res.status(201).json(mindmap);
-        } catch (error) {
-            res.status(500).json({ error: `Internal server error: ${error.message}` });
-        }
-    },
-    updateMindmap: async (req, res) => {
-        try {
-            const mindmap = await Mindmap.findByIdAndUpdate(req.params.id, req.body, { new: true });
-            if (!mindmap) {
-                res.status(404).json({ error: 'Mindmap not found by id ' + req.params.id });
-            }
-            res.status(200).json(mindmap);
-        } catch (error) {
-            res.status(500).json({ error: `Internal server error: ${error.message}` });
-        }
-    },
-    deleteMindmap: async (req, res) => {
-        try {
-            const mindmap = await Mindmap.findByIdAndDelete(req.params.id);
-            if (!mindmap) {
-                return res.status(404).json({ error: "Mindmap not found" });
-            }
-            res.status(200).json({ message: "Mindmap deleted successfully" });
-        } catch (error) {
-            res.status(500).json({ error: `Internal server error: ${error.message}` });
-        }
-    }
-    // all mindmaps that user has access to
-    // all mindmaps that user owns
+			res.status(200).json({
+				mindmaps,
+				pagination: {
+					currentPage: page,
+					totalPages,
+					totalMindmaps,
+					itemsPerPage: limit,
+				},
+			});
+		} catch (error) {
+			res.status(500).json({ error: `Internal server error: ${error.message}` });
+		}
+	},
+	getMindmap: async (req, res) => {
+		try {
+			const mindmap = await Mindmap.findById(req.params.id);
+			if (!mindmap) {
+				res.status(404).json({ error: 'Mindmap not found by id ' + req.params.id });
+			}
+			res.status(200).json(mindmap);
+		} catch (error) {
+			res.status(500).json({ error: `Internal server error: ${error.message}` });
+		}
+	},
+	addMindmap: async (req, res) => {
+		try {
+			const { title, description, owner } = req.body;
+			const mindmap = new Mindmap({ title, description, owner });
+			await mindmap.save();
+			res.status(201).json(mindmap);
+		} catch (error) {
+			res.status(500).json({ error: `Internal server error: ${error.message}` });
+		}
+	},
+	updateMindmap: async (req, res) => {
+		try {
+			const mindmap = await Mindmap.findByIdAndUpdate(req.params.id, req.body, { new: true });
+			if (!mindmap) {
+				res.status(404).json({ error: 'Mindmap not found by id ' + req.params.id });
+			}
+			res.status(200).json(mindmap);
+		} catch (error) {
+			res.status(500).json({ error: `Internal server error: ${error.message}` });
+		}
+	},
+	deleteMindmap: async (req, res) => {
+		try {
+			const mindmap = await Mindmap.findByIdAndDelete(req.params.id);
+			if (!mindmap) {
+				return res.status(404).json({ error: 'Mindmap not found' });
+			}
+			res.status(200).json({ message: 'Mindmap deleted successfully' });
+		} catch (error) {
+			res.status(500).json({ error: `Internal server error: ${error.message}` });
+		}
+	},
+	// all mindmaps that user has access to
+	// all mindmaps that user owns
 };
