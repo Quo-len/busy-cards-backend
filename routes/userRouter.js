@@ -7,7 +7,7 @@ router.get('/', userController.getAllUsers);
 router.post('/', userController.addUser);
 
 router
-	.route('/:id')
+	.route('/:userId')
 	.get(userController.getUser)
 	.patch(verifyToken, authorize(['admin']), userController.updateUser)
 	.delete(verifyToken, authorize(['admin']), userController.deleteUser);

@@ -23,6 +23,7 @@ module.exports = {
 			const result = participants.map((p) => ({
 				_id: p._id,
 				mindmap: p.mindmap,
+				user: p.user.id,
 				username: p.user.username,
 				email: p.user.email,
 				accessLevel: p.accessLevel,
@@ -76,9 +77,13 @@ module.exports = {
 		try {
 			const { mindmapId, userId } = req.params;
 			const { accessLevel } = req.body;
-			const participant = await Participant.findOneAndUpdate({ mindmap: mindmapId, user: userId }, accessLevel, {
-				new: true,
-			});
+			const participant = await Participant.findOneAndUpdate(
+				{ mindmap: mindmapId, user: userId },
+				{ accessLevel },
+				{
+					new: true,
+				}
+			);
 			if (!participant) {
 				res.status(404).json({ error: 'Participant not found by id ' + req.params.id });
 			}
@@ -89,7 +94,7 @@ module.exports = {
 	},
 	deleteParticipant: async (req, res) => {
 		try {
-			const participant = await Participant.findByIdAndDelete({
+			const participant = await Participant.findOneAndDelete({
 				mindmap: req.params.mindmapId,
 				user: req.params.userId,
 			});

@@ -47,7 +47,8 @@ module.exports = {
 	deleteFavorite: async (req, res) => {
 		try {
 			const { userId, mindmapId } = req.body;
-			const favorite = Favorite.findByIdAndDelete({ user: userId, mindmap: mindmapId });
+			const favorite = await Favorite.findOneAndDelete({ user: userId, mindmap: mindmapId });
+			console.log(favorite);
 			if (!favorite) {
 				return res.status(404).json({ error: 'Favorite not found' });
 			}

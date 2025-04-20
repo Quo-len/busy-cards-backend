@@ -41,6 +41,7 @@ module.exports = {
 			const payload = {
 				user: {
 					id: user.id,
+					...(user.role && { role: user.role }),
 				},
 			};
 

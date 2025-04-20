@@ -7,7 +7,7 @@ function verifyToken(req, res, next) {
 
 	if (!authHeader) {
 		return res.status(401).json({
-			msg: 'No token, authorization denied',
+			message: 'No token, authorization denied',
 		});
 	}
 
@@ -21,17 +21,25 @@ function verifyToken(req, res, next) {
 
 	try {
 		const decoded = jwt.verify(token, config.jwtSecret);
-
 		req.user = decoded.user;
 		next();
 	} catch (error) {
+		if (error.name === 'TokenExpiredError') {
+			return res.status(401).json({ message: 'Token expired' });
+		}
 		return res.status(401).json({ message: `Token is not valid: ${error.message}` });
 	}
 }
 
 function authorize(allowedRoles = []) {
 	return (req, res, next) => {
-		if (!req.user || !allowedRoles.includes(req.user.role)) {
+		const userRole = req.user.role;
+		const userId = req.user?.id;
+		const targetId = req.params.userId;
+		const isAdmin = allowedRoles.includes(userRole);
+		const isOwner = String(userId) === String(targetId);
+
+		if (!req.user || (!isAdmin && !isOwner)) {
 			return res.status(403).json({ message: 'Access denied: insufficient permissions' });
 		}
 		next();

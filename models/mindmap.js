@@ -15,6 +15,10 @@ const mindmapSchema = new mongoose.Schema(
 			ref: 'User',
 			required: true,
 		},
+		isPublic: {
+			type: Boolean,
+			default: false,
+		},
 		lastModified: {
 			type: Date,
 			default: Date.now,

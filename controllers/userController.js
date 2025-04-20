@@ -14,9 +14,10 @@ module.exports = {
 	},
 	getUser: async (req, res) => {
 		try {
-			const user = await User.findById(req.params.id);
+			const userId = req.params.userId;
+			const user = await User.findById(userId);
 			if (!user) {
-				return res.status(404).json({ error: 'User not found by id ' + req.params.id });
+				return res.status(404).json({ error: 'User not found by id ' + userId });
 			}
 			res.status(200).json(user);
 		} catch (error) {
@@ -25,9 +26,10 @@ module.exports = {
 	},
 	getUserEmail: async (req, res) => {
 		try {
-			const user = await User.findOne({ email: req.params.email });
+			const { email } = req.params.email;
+			const user = await User.findOne({ email });
 			if (!user) {
-				return res.status(404).json({ error: 'User not found by email ' + req.params.email });
+				return res.status(404).json({ error: 'User not found by email ' + email });
 			}
 			res.status(200).json(user);
 		} catch (error) {
@@ -46,7 +48,7 @@ module.exports = {
 	},
 	updateUser: async (req, res) => {
 		try {
-			const userId = req.user.id;
+			const userId = req.params.userId;
 			const user = await User.findByIdAndUpdate(userId, req.body, { new: true });
 			if (!user) {
 				return res.status(404).json({ error: 'User not found by id ' + userId });
@@ -58,7 +60,8 @@ module.exports = {
 	},
 	deleteUser: async (req, res) => {
 		try {
-			const user = await User.findByIdAndDelete(req.params.id);
+			const userId = req.params.userId;
+			const user = await User.findByIdAndDelete(userId);
 			if (!user) {
 				return res.status(404).json({ error: 'User not found' });
 			}
