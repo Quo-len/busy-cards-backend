@@ -9,7 +9,7 @@ module.exports = {
 			const page = parseInt(req.query.page) || 1;
 			const limit = parseInt(req.query.limit) || 10;
 			// lastModified, createdAt
-			const { owner, participantUserId, sortBy = 'lastModified', order = 'desc' } = req.query;
+			const { owner, participant, sortBy = 'lastModified', order = 'desc' } = req.query;
 
 			const sortOptions = {
 				[sortBy]: order === 'desc' ? -1 : 1,
@@ -18,8 +18,8 @@ module.exports = {
 			const skip = (page - 1) * limit;
 
 			let query = {};
-			if (owner && participantUserId) {
-				const participantEntries = await Participant.find({ user: participantUserId }).select('mindmap');
+			if (owner && participant) {
+				const participantEntries = await Participant.find({ user: participant }).select('mindmap');
 
 				const participantMindmapIds = participantEntries.map((entry) => entry.mindmap);
 
@@ -29,8 +29,8 @@ module.exports = {
 					query.owner = owner;
 				}
 
-				if (participantUserId) {
-					const participantEntries = await Participant.find({ user: participantUserId }).select('mindmap');
+				if (participant) {
+					const participantEntries = await Participant.find({ user: participant }).select('mindmap');
 
 					const participantMindmapIds = participantEntries.map((entry) => entry.mindmap);
 
@@ -38,7 +38,7 @@ module.exports = {
 				}
 			}
 
-			const mindmaps = await db.Mindmap.find(query)
+			const mindmaps = await Mindmap.find(query)
 				.sort(sortOptions)
 				.skip(skip)
 				.limit(limit)
@@ -48,8 +48,13 @@ module.exports = {
 					populate: {
 						path: 'user',
 						model: 'User',
-						select: 'username email', // Select only specific user fields
+						select: 'username email avatar',
 					},
+				})
+				.populate({
+					path: 'owner',
+					model: 'User',
+					select: '_id username email avatar',
 				});
 
 			const totalMindmaps = await Mindmap.countDocuments(query);

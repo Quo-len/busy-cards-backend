@@ -25,6 +25,7 @@ module.exports = {
 				mindmap: p.mindmap,
 				user: p.user.id,
 				username: p.user.username,
+				avatar: p.user.avatar,
 				email: p.user.email,
 				accessLevel: p.accessLevel,
 				joinedAt: p.joinedAt,
@@ -59,8 +60,12 @@ module.exports = {
 				return res.status(404).json({ error: 'Mindmap not found with id ' + mindmapId });
 			}
 			const existingParticipant = await Participant.findOne({ mindmap: mindmapId, user: userId });
+			const isOwner = String(mindmap.owner) === String(userId);
 			if (existingParticipant) {
 				return res.status(400).json({ error: 'User is already a participant' });
+			}
+			if (isOwner) {
+				return res.status(400).json({ error: "Owner can't become participant of his own mindmap" });
 			}
 			const participant = new Participant({
 				mindmap: mindmapId,

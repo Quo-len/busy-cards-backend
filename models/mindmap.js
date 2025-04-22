@@ -15,6 +15,27 @@ const mindmapSchema = new mongoose.Schema(
 			ref: 'User',
 			required: true,
 		},
+		nodes: [
+			{
+				id: String,
+				type: String,
+				position: {
+					x: Number,
+					y: Number,
+				},
+				data: Schema.Types.Mixed,
+			},
+		],
+		edges: [
+			{
+				id: String,
+				source: String,
+				target: String,
+				type: String,
+				sourceHandle: String,
+				targetHandle: String,
+			},
+		],
 		isPublic: {
 			type: Boolean,
 			default: false,
@@ -31,7 +52,8 @@ const mindmapSchema = new mongoose.Schema(
 	{
 		toJSON: { virtuals: true },
 		toObject: { virtuals: true },
-	}
+	},
+	{ strict: false }
 );
 
 mindmapSchema.virtual('participants', {

@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const config = require('./config');
 const routes = require('./routes');
 
@@ -8,11 +9,12 @@ require('./database');
 
 const host = config.ip;
 const port = config.port;
-const wsPort = config.ws_port;
 
 const app = express();
 
 // CORS Configuration
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use(
 	cors({
 		origin: ['http://localhost:5173', 'http://localhost:3000'], // Add your React app's URLs
@@ -29,5 +31,4 @@ app.get('/', (req, res) => {
 
 app.listen(port, host, () => {
 	console.log(`Server running on http://${host}:${port}`);
-	console.log(`WebSocket server running on ws://${host}:${wsPort}`);
 });

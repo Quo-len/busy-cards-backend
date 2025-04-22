@@ -1,0 +1,17 @@
+{
+  "e41bb0ea-e1ef-4dad-8f3c-5d6f8bbc4f16": {
+    "id": "e41bb0ea-e1ef-4dad-8f3c-5d6f8bbc4f16",
+    "type": "custom",
+    "source": "86b81943-8875-419f-a357-8270ef1f2aab",
+    "target": "stress-1",
+    "sourceHandle": "top"
+  },
+  "ede0fc33-7c4b-4499-8a89-7ae9f80ff1f7": {
+    "id": "ede0fc33-7c4b-4499-8a89-7ae9f80ff1f7",
+    "type": "custom",
+    "source": "86b81943-8875-419f-a357-8270ef1f2aab",
+    "target": "bc1a067c-b36b-4bad-9569-5de28ce766e4",
+    "sourceHandle": "bottom",
+    "targetHandle": "top"
+  }
+}

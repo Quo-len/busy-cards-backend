@@ -12,4 +12,6 @@ router
 	.patch(verifyToken, authorize(['admin']), userController.updateUser)
 	.delete(verifyToken, authorize(['admin']), userController.deleteUser);
 
+router.route('/avatar/:userId').patch(verifyToken, authorize(['admin']), userController.updateAvatar);
+
 module.exports = router;

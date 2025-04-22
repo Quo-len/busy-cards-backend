@@ -1,0 +1,35 @@
+{
+  "stress-1": {
+    "id": "stress-1",
+    "type": "default",
+    "data": {
+      "label": "Node 1"
+    },
+    "position": {
+      "x": -120,
+      "y": -540
+    }
+  },
+  "86b81943-8875-419f-a357-8270ef1f2aab": {
+    "id": "86b81943-8875-419f-a357-8270ef1f2aab",
+    "type": "custom",
+    "data": {
+      "label": "Node 2aab"
+    },
+    "position": {
+      "x": 630,
+      "y": -615
+    }
+  },
+  "bc1a067c-b36b-4bad-9569-5de28ce766e4": {
+    "id": "bc1a067c-b36b-4bad-9569-5de28ce766e4",
+    "type": "custom",
+    "data": {
+      "label": "Node 66e4"
+    },
+    "position": {
+      "x": -690,
+      "y": -270
+    }
+  }
+}

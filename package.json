@@ -15,6 +15,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
+    "js-base64": "^3.7.7",
     "jsonwebtoken": "^9.0.2",
     "lodash.debounce": "^4.0.8",
     "mongoose": "^8.8.3",
@@ -24,8 +25,10 @@
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "ws": "^8.18.1",
+    "y-mongodb": "^0.1.11",
+    "y-mongodb-provider": "^0.2.0",
     "y-websocket": "^2.1.0",
-    "yjs": "^13.6.24"
+    "yjs": "^13.6.26"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
