@@ -10,9 +10,7 @@ const UserSchema = new Schema(
 		},
 		username: {
 			type: String,
-			default: function () {
-				return this.email;
-			},
+			required: true,
 		},
 		avatar: {
 			type: String,
@@ -26,9 +24,9 @@ const UserSchema = new Schema(
 			type: Date,
 			default: Date.now,
 		},
-		about: {
+		bio: {
 			type: String,
-			default: 'No information',
+			default: 'Опис відсутній',
 		},
 		lastLogin: {
 			type: Date,

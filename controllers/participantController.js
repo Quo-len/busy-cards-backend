@@ -32,18 +32,18 @@ module.exports = {
 			}));
 			res.status(200).json(result);
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	getParticipant: async (req, res) => {
 		try {
 			const participant = await Participant.findOne({ mindmap: req.params.mindmapId, user: req.params.userId });
 			if (!participant) {
-				res.status(404).json({ error: 'Participant not found by id ' + req.params.id });
+				res.status(404).json({ error: 'Учасника не знайдено' });
 			}
 			res.status(200).json(participant);
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	addParticipant: async (req, res) => {
@@ -53,19 +53,19 @@ module.exports = {
 
 			const user = await User.findById(userId);
 			if (!user) {
-				return res.status(404).json({ error: 'User not found with id ' + userId });
+				return res.status(404).json({ error: 'Користувача не знайдено.' });
 			}
 			const mindmap = await Mindmap.findById(mindmapId);
 			if (!mindmap) {
-				return res.status(404).json({ error: 'Mindmap not found with id ' + mindmapId });
+				return res.status(404).json({ error: 'Інтелект-карту не знайдено.' });
 			}
 			const existingParticipant = await Participant.findOne({ mindmap: mindmapId, user: userId });
 			const isOwner = String(mindmap.owner) === String(userId);
 			if (existingParticipant) {
-				return res.status(400).json({ error: 'User is already a participant' });
+				return res.status(400).json({ error: 'Користувач вже є учасником.' });
 			}
 			if (isOwner) {
-				return res.status(400).json({ error: "Owner can't become participant of his own mindmap" });
+				return res.status(400).json({ error: 'Власник не може стати учасником.' });
 			}
 			const participant = new Participant({
 				mindmap: mindmapId,
@@ -75,7 +75,7 @@ module.exports = {
 			await participant.save();
 			res.status(201).json(participant);
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	updateParticipant: async (req, res) => {
@@ -90,11 +90,11 @@ module.exports = {
 				}
 			);
 			if (!participant) {
-				res.status(404).json({ error: 'Participant not found by id ' + req.params.id });
+				res.status(404).json({ error: 'Учасника не знайдено.' });
 			}
 			res.status(200).json(participant);
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	deleteParticipant: async (req, res) => {
@@ -104,11 +104,11 @@ module.exports = {
 				user: req.params.userId,
 			});
 			if (!participant) {
-				return res.status(404).json({ error: 'Participant not found' });
+				return res.status(404).json({ error: 'Учасника не знайдено.' });
 			}
-			res.status(200).json({ message: 'Participant deleted successfully' });
+			res.status(200).json({ message: 'Успішно видалено учасника.' });
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 };

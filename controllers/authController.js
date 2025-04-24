@@ -11,7 +11,7 @@ module.exports = {
 			const { email, password, username } = req.body;
 			const userExists = await User.findOne({ email: email });
 			if (userExists) {
-				return res.status(400).json({ error: 'User already exists' });
+				return res.status(400).json({ error: 'Користувач під такоє пошною вже зареєстрований.' });
 			}
 
 			const salt = await bcrypt.genSalt(10);
@@ -20,9 +20,9 @@ module.exports = {
 			const user = new User({ email: email, password: passwordHashed, username: username });
 			await user.save();
 
-			res.status(201).json({ message: 'User registered successfully' });
+			res.status(201).json({ message: 'Користувача успішно зареєстровано.' });
 		} catch (error) {
-			res.status(500).json({ error: `Server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	login: async (req, res) => {
@@ -30,12 +30,12 @@ module.exports = {
 			const { email, password } = req.body;
 			const user = await User.findOne({ email: email });
 			if (!user) {
-				return res.status(400).json({ error: 'Invalid credentials' });
+				return res.status(400).json({ error: 'Неправильні дані для входу.' });
 			}
 
 			const isMatch = await bcrypt.compare(password, user.password);
 			if (!isMatch) {
-				return res.status(500).json({ error: 'Wrong password' });
+				return res.status(500).json({ error: 'Неправильний пароль.' });
 			}
 
 			const payload = {
@@ -48,7 +48,7 @@ module.exports = {
 			const token = jwt.sign(payload, jwtSecret, { expiresIn: '24h' });
 			res.status(201).json({ token: token });
 		} catch (error) {
-			res.status(500).json({ error: `Server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	updatePassword: async (req, res) => {
@@ -57,12 +57,12 @@ module.exports = {
 			const { currentPassword, newPassword } = req.body;
 			const user = await User.findById(userId);
 			if (!user) {
-				return res.status(404).json({ error: 'User not found' });
+				return res.status(404).json({ error: 'Користувача не знайдено.' });
 			}
 
 			const isMatch = await bcrypt.compare(currentPassword, user.password);
 			if (!isMatch) {
-				return res.status(400).json({ error: 'Current password is incorrect' });
+				return res.status(400).json({ error: 'Неправильний теперішній пароль.' });
 			}
 
 			const salt = await bcrypt.genSalt(10);
@@ -71,9 +71,9 @@ module.exports = {
 			user.password = passwordHashed;
 			await user.save();
 
-			res.status(201).json({ message: 'Password updated successfully' });
+			res.status(201).json({ message: 'Пароль оновлено успішно.' });
 		} catch (error) {
-			res.status(500).json({ error: `Server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 
@@ -81,21 +81,19 @@ module.exports = {
 		try {
 			const { email } = req.body;
 
-			// Check if the user exists
 			const user = await User.findOne({ email });
 			if (!user) {
-				return res.status(404).json({ error: 'User not found' });
+				return res.status(404).json({ error: 'Користувача не знайдено' });
 			}
 
-			// Generate a reset token
 			const resetToken = crypto.randomBytes(20).toString('hex');
 			user.resetToken = resetToken;
 			user.resetTokenExpiration = Date.now() + 3600000; // Token expires in 1 hour
 			await user.save();
-			res.status(200).json({ message: 'Password reset token sent' });
+			res.status(200).json({ message: 'Посилання для скидання пароля надіслано.' });
 		} catch (error) {
 			console.error('Error generating reset token:', error);
-			res.status(500).json({ error: 'An error occurred while generating the reset token' });
+			res.status(500).json({ error: 'Виникла помилка під час відновлення пароля.' });
 		}
 	},
 
@@ -103,29 +101,26 @@ module.exports = {
 		try {
 			const { resetToken, newPassword } = req.body;
 
-			// Find the user with the provided reset token
 			const user = await User.findOne({
 				resetToken,
 				resetTokenExpiration: { $gt: Date.now() },
 			});
 			if (!user) {
-				return res.status(401).json({ error: 'Invalid or expired reset token' });
+				return res.status(401).json({ error: 'Час авторизації сплинув.' });
 			}
 
-			// Encrypt and hash the new password
 			const salt = await bcrypt.genSalt(10);
 			const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-			// Update the user's password and reset token fields
 			user.password = hashedPassword;
 			user.resetToken = undefined;
 			user.resetTokenExpiration = undefined;
 			await user.save();
 
-			res.status(200).json({ message: 'Password reset successful' });
+			res.status(200).json({ message: 'Скидання пароля відбулося успішно.' });
 		} catch (error) {
 			console.error('Error resetting password:', error);
-			res.status(500).json({ error: 'An error occurred while resetting the password' });
+			res.status(500).json({ error: 'Виникла помилка під час скидання пароля.' });
 		}
 	},
 

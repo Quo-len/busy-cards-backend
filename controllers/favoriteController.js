@@ -37,7 +37,7 @@ module.exports = {
 			}));
 			res.status(200).json(result);
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	getFavorite: async (req, res) => {
@@ -46,26 +46,26 @@ module.exports = {
 			const favorite = await Favorite.findOne({ user: userId, mindmap: mindmapId });
 
 			if (!favorite) {
-				return res.status(404).json({ error: 'Favorite not found' });
+				return res.status(404).json({ error: 'Улюблене не знайдено.' });
 			}
 
 			res.status(200).json(favorite);
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	addFavorite: async (req, res) => {
 		try {
 			const { userId, mindmapId } = req.body;
-			const favoriteExists = await Favorite.findOne({ user: userId, mindmap: mindmapId });
-			if (favoriteExists) {
-				return res.status(400).json({ error: 'Favorite already exists' });
+			const existingFavorite = await Favorite.findOne({ user: userId, mindmap: mindmapId });
+			if (existingFavorite) {
+				return res.status(400).json({ error: 'Улюблене вже існує.' });
 			}
 			const favorite = new Favorite({ user: userId, mindmap: mindmapId });
 			await favorite.save();
 			res.status(201).json(favorite);
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	deleteFavorite: async (req, res) => {
@@ -73,11 +73,11 @@ module.exports = {
 			const { userId, mindmapId } = req.body;
 			const favorite = await Favorite.findOneAndDelete({ user: userId, mindmap: mindmapId });
 			if (!favorite) {
-				return res.status(404).json({ error: 'Favorite not found' });
+				return res.status(404).json({ error: 'Улюблене не знайдено.' });
 			}
-			res.status(200).json({ message: 'Favorite deleted successfully' });
+			res.status(200).json({ message: 'Улюблене успішно видалено.' });
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 };

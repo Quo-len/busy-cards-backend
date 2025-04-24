@@ -71,18 +71,18 @@ module.exports = {
 				},
 			});
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	getMindmap: async (req, res) => {
 		try {
 			const mindmap = await Mindmap.findById(req.params.id);
 			if (!mindmap) {
-				res.status(404).json({ error: 'Mindmap not found by id ' + req.params.id });
+				res.status(404).json({ error: 'Інтелект-карту не знайдено.' });
 			}
 			res.status(200).json(mindmap);
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	addMindmap: async (req, res) => {
@@ -92,29 +92,29 @@ module.exports = {
 			await mindmap.save();
 			res.status(201).json(mindmap);
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	updateMindmap: async (req, res) => {
 		try {
 			const mindmap = await Mindmap.findByIdAndUpdate(req.params.id, req.body, { new: true });
 			if (!mindmap) {
-				res.status(404).json({ error: 'Mindmap not found by id ' + req.params.id });
+				res.status(404).json({ error: 'Інтелект-карту не знайдено.' });
 			}
 			res.status(200).json(mindmap);
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	deleteMindmap: async (req, res) => {
 		try {
 			const mindmap = await Mindmap.findByIdAndDelete(req.params.id);
 			if (!mindmap) {
-				return res.status(404).json({ error: 'Mindmap not found' });
+				return res.status(404).json({ error: 'Інтелект-карту не знайдено.' });
 			}
-			res.status(200).json({ message: 'Mindmap deleted successfully' });
+			res.status(200).json({ message: 'Інтелект-карту успішно видалено.' });
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	// all mindmaps that user has access to

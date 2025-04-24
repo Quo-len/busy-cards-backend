@@ -42,7 +42,7 @@ module.exports = {
 			const users = await User.find();
 			res.status(200).json(users);
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	getUser: async (req, res) => {
@@ -50,11 +50,11 @@ module.exports = {
 			const userId = req.params.userId;
 			const user = await User.findById(userId);
 			if (!user) {
-				return res.status(404).json({ error: 'User not found by id ' + userId });
+				return res.status(404).json({ error: 'Користувача не знайдено.' });
 			}
 			res.status(200).json(user);
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	getUserEmail: async (req, res) => {
@@ -62,11 +62,11 @@ module.exports = {
 			const { email } = req.params.email;
 			const user = await User.findOne({ email });
 			if (!user) {
-				return res.status(404).json({ error: 'User not found by email ' + email });
+				return res.status(404).json({ error: 'Користувача з такою поштою не знайдено.' });
 			}
 			res.status(200).json(user);
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	addUser: async (req, res) => {
@@ -88,7 +88,7 @@ module.exports = {
 				await user.save();
 				res.status(201).json(user);
 			} catch (error) {
-				res.status(500).json({ error: `Internal server error: ${error.message}` });
+				res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 			}
 		});
 	},
@@ -103,7 +103,7 @@ module.exports = {
 
 				const user = await User.findById(userId);
 				if (!user) {
-					return res.status(404).json({ error: 'User not found by id ' + userId });
+					return res.status(404).json({ error: 'Користувача не знайдено.' });
 				}
 
 				if (user.avatar) {
@@ -120,12 +120,12 @@ module.exports = {
 
 				const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
 				if (!updatedUser) {
-					return res.status(404).json({ error: 'User not found by id ' + userId });
+					return res.status(404).json({ error: 'Користувача не знайдено.' });
 				}
 
 				res.status(200).json(updatedUser);
 			} catch (error) {
-				res.status(500).json({ error: `Internal server error: ${error.message}` });
+				res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 			}
 		});
 	},
@@ -134,11 +134,11 @@ module.exports = {
 			const userId = req.params.userId;
 			const user = await User.findByIdAndUpdate(userId, req.body, { new: true });
 			if (!user) {
-				return res.status(404).json({ error: 'User not found by id ' + userId });
+				return res.status(404).json({ error: 'Користувача не знайдено.' });
 			}
 			res.status(200).json(user);
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	deleteUser: async (req, res) => {
@@ -146,11 +146,11 @@ module.exports = {
 			const userId = req.params.userId;
 			const user = await User.findByIdAndDelete(userId);
 			if (!user) {
-				return res.status(404).json({ error: 'User not found' });
+				return res.status(404).json({ error: 'Користувача не знайдено.' });
 			}
-			res.status(200).json({ message: 'User deleted successfully' });
+			res.status(200).json({ message: 'Користувача успішно видалено.' });
 		} catch (error) {
-			res.status(500).json({ error: `Internal server error: ${error.message}` });
+			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 };

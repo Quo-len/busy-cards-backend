@@ -1,7 +1,8 @@
 const http = require('http');
 const WebSocket = require('ws');
 const Y = require('yjs');
-const { MongodbPersistence } = require('y-mongodb');
+//const { MongodbPersistence } = require('y-mongodb');
+const { MongodbPersistence } = require('y-mongodb-provider');
 const utils = require('y-websocket/bin/utils');
 const mongoose = require('mongoose');
 const db = require('./models');
@@ -14,8 +15,18 @@ const db_pass = config.db_pass;
 const db_uri = `mongodb+srv://${db_login}:${db_pass}@busycardsclaster.7wkb9.mongodb.net/?retryWrites=true&w=majority&appName=BusyCardsClaster`;
 
 // Use the same connection string for both MongoDB connections
+
+// y-mondodb-provider
 const collection = 'yjs-transactions';
-const ldb = new MongodbPersistence(db_uri, collection);
+const persistence = new MongodbPersistence(db_uri, {
+	collectionName: collection,
+	flushSize: 100,
+	multipleCollections: false,
+});
+
+// y-mongodb
+// const collection = 'yjs-transactions';
+// const persistence = new MongodbPersistence(db_uri, collection);
 
 // Connect mongoose to MongoDB
 async function connect() {
@@ -161,20 +172,17 @@ utils.setPersistence({
 			// Store the document in our map for later access
 			mindmapRooms.set(docName, ydoc);
 
-			const persistedYdoc = await ldb.getYDoc(docName);
+			const persistedYdoc = await persistence.getYDoc(docName);
 			const newUpdates = Y.encodeStateAsUpdate(ydoc);
-			await ldb.storeUpdate(docName, newUpdates);
+			await persistence.storeUpdate(docName, newUpdates);
 			Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc));
 
-			// Log initial state of nodes and edges
+			// Log initial state of `node`s and edges
 			const nodesMap = ydoc.getMap('nodes');
 			const edgesMap = ydoc.getMap('edges');
 
-			//	console.log('INITIAL NODES:', JSON.stringify(Array.from(nodesMap.entries()), null, 2));
-			//	console.log('INITIAL EDGES:', JSON.stringify(Array.from(edgesMap.entries()), null, 2));
-
-			console.log('FINAL NODES:', JSON.stringify(Array.from(nodesMap.entries())[0], null, 2));
-			console.log('FINAL EDGES:', JSON.stringify(Array.from(edgesMap.entries())[0], null, 2));
+			console.log('FINAL NODES:', JSON.stringify(Array.from(nodesMap.entries()), null, 2));
+			console.log('FINAL EDGES:', JSON.stringify(Array.from(edgesMap.entries()), null, 2));
 
 			const mindmapId = docName.startsWith('mindmap-') ? docName.substring(8) : null;
 
@@ -211,27 +219,53 @@ utils.setPersistence({
 			// Setup observers for nodes and edges maps
 			nodesMap.observe((event) => {
 				console.log(`\n===== NODES UPDATED IN ${docName} =====`);
-				const changedKeys = Array.from(event.changes.keys.entries());
-				//	console.log('CHANGED NODE KEYS:', JSON.stringify(changedKeys, null, 2));
-				//	console.log('CURRENT NODES:', JSON.stringify(Array.from(nodesMap.entries()), null, 2));
+
+				// Track deleted keys
+				const deletedKeys = [];
+				event.changes.keys.forEach((change, key) => {
+					if (change.action === 'delete') {
+						deletedKeys.push(key);
+						console.log(`Node deleted: ${key}`);
+					}
+				});
+
+				// If we have deletions, update the database right away
+				if (deletedKeys.length > 0 && mindmapId) {
+					updateMindmapInDatabase(mindmapId, nodesMap, edgesMap);
+				}
 			});
 
 			edgesMap.observe((event) => {
 				console.log(`\n===== EDGES UPDATED IN ${docName} =====`);
-				const changedKeys = Array.from(event.changes.keys.entries());
-				//	console.log('CHANGED EDGE KEYS:', JSON.stringify(changedKeys, null, 2));
-				//	console.log('CURRENT EDGES:', JSON.stringify(Array.from(edgesMap.entries()), null, 2));
-			});
 
+				const changedKeys = Array.from(event.changes.keys.entries());
+				// Track deleted keys
+				const deletedKeys = [];
+				event.changes.keys.forEach((change, key) => {
+					console.log('ff ' + change.action);
+					if (change.action === 'delete') {
+						deletedKeys.push(key);
+						console.log(`Edge deleted: ${key}`);
+					}
+				});
+
+				// If we have deletions, update the database right away
+				if (deletedKeys.length > 0 && mindmapId) {
+					updateMindmapInDatabase(mindmapId, nodesMap, edgesMap);
+				}
+			});
 			// Setup document update observer
 			ydoc.on('update', async (update, origin, doc) => {
 				console.log(`\n===== DOCUMENT ${docName} UPDATED =====`);
-				//	console.log('UPDATE ORIGIN:', origin);
 
 				// Store the update
-				await ldb.storeUpdate(docName, update);
+				await persistence.storeUpdate(docName, update);
 
-				// Log current state after update
+				// Update the database with the current state
+				if (mindmapId) {
+					updateMindmapInDatabase(mindmapId, nodesMap, edgesMap);
+				}
+
 				console.log('CURRENT NODES COUNT:', nodesMap.size);
 				console.log('CURRENT EDGES COUNT:', edgesMap.size);
 			});
@@ -261,6 +295,31 @@ utils.setPersistence({
 		});
 	},
 });
+
+async function updateMindmapInDatabase(mindmapId, nodesMap, edgesMap) {
+	try {
+		const nodes = JSON.stringify(Object.fromEntries(nodesMap), null, 2);
+		const edges = JSON.stringify(Object.fromEntries(edgesMap), null, 2);
+
+		console.log(`Updating mindmap ${mindmapId} in database`);
+		console.log(`Nodes count: ${nodesMap.size}, Edges count: ${edgesMap.size}`);
+
+		const updatedMindmap = await Mindmap.findByIdAndUpdate(
+			mindmapId,
+			{
+				nodes: nodes,
+				edges: edges,
+				lastModified: new Date(),
+			},
+			{ new: true, runValidators: false }
+		);
+		await updatedMindmap.save();
+
+		console.log(`Mindmap ${mindmapId} updated successfully`);
+	} catch (error) {
+		console.error(`Error updating mindmap ${mindmapId}:`, error);
+	}
+}
 
 // Start the server
 server.listen(wsPort);
