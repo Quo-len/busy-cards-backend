@@ -1,125 +1,28 @@
 {
-  "af0c00ea-a316-4a7c-8f9b-e7d65414e1e4": {
-    "id": "af0c00ea-a316-4a7c-8f9b-e7d65414e1e4",
+  "cd0b4739-1e77-4487-b36d-7fd37cd67dfa": {
+    "id": "cd0b4739-1e77-4487-b36d-7fd37cd67dfa",
     "type": "custom",
     "data": {
-      "label": "Node e1e4",
-      "color": "orange"
+      "label": "test",
+      "color": "red",
+      "width": 265,
+      "height": 150
     },
     "position": {
-      "x": 795,
-      "y": 1080
+      "x": 660,
+      "y": -75
     },
     "dimensions": {}
   },
-  "c7607fb3-ff52-45b8-9918-12765cdc87fc": {
-    "id": "c7607fb3-ff52-45b8-9918-12765cdc87fc",
+  "850fe1c6-cac1-4be0-9768-44c6c9a60600": {
+    "id": "850fe1c6-cac1-4be0-9768-44c6c9a60600",
     "type": "custom",
     "data": {
-      "label": "Node 87fc"
+      "label": "custom node"
     },
     "position": {
-      "x": 1170,
-      "y": 1140
-    },
-    "dimensions": {}
-  },
-  "1509d2b5-3699-4dfd-9421-c71e4bd25016": {
-    "id": "1509d2b5-3699-4dfd-9421-c71e4bd25016",
-    "type": "custom",
-    "data": {
-      "label": "Node 1",
-      "color": "yellow",
-      "shape": "hexagon"
-    },
-    "position": {
-      "x": 1080,
-      "y": 1005
-    },
-    "dimensions": {}
-  },
-  "064c9fb3-8db9-4c2c-acfe-fa4c048904c9": {
-    "id": "064c9fb3-8db9-4c2c-acfe-fa4c048904c9",
-    "type": "custom",
-    "data": {
-      "label": "Node 04c9"
-    },
-    "position": {
-      "x": 465,
-      "y": 1200
-    },
-    "dimensions": {}
-  },
-  "4a9250df-b7c2-44db-98d0-4734bd7ccc07": {
-    "id": "4a9250df-b7c2-44db-98d0-4734bd7ccc07",
-    "type": "custom",
-    "data": {
-      "label": "Node cc07dfsfsdfsd",
-      "color": "red"
-    },
-    "position": {
-      "x": 780,
-      "y": 945
-    },
-    "dimensions": {}
-  },
-  "e5c2cbf9-b0f5-4d70-a91a-14b2f429757b": {
-    "id": "e5c2cbf9-b0f5-4d70-a91a-14b2f429757b",
-    "type": "custom",
-    "data": {
-      "label": "Node 757b"
-    },
-    "position": {
-      "x": 915,
-      "y": 1275
-    },
-    "dimensions": {}
-  },
-  "4f8ac2c9-6a2a-4f65-85dc-08b77155f14b": {
-    "id": "4f8ac2c9-6a2a-4f65-85dc-08b77155f14b",
-    "type": "custom",
-    "data": {
-      "label": "Node f14b"
-    },
-    "position": {
-      "x": 795,
-      "y": 1185
-    },
-    "dimensions": {}
-  },
-  "72ce070e-0ae9-45f5-a7d6-c7f5334bf775": {
-    "id": "72ce070e-0ae9-45f5-a7d6-c7f5334bf775",
-    "type": "custom",
-    "data": {
-      "label": "Node f775"
-    },
-    "position": {
-      "x": 1050,
-      "y": 1275
-    },
-    "dimensions": {}
-  },
-  "66afcd9b-3134-49dd-9c77-d2a40f3c94d0": {
-    "id": "66afcd9b-3134-49dd-9c77-d2a40f3c94d0",
-    "type": "custom",
-    "data": {
-      "label": "Node 94d0"
-    },
-    "position": {
-      "x": 645,
-      "y": 1200
-    },
-    "dimensions": {}
-  },
-  "f2c06648-03bc-4b2b-a0e2-ff53d979c4bd": {
-    "id": "f2c06648-03bc-4b2b-a0e2-ff53d979c4bd",
-    "type": "custom",
-    "data": {
-      "label": "Node c4bd"
-    },
-    "position": {
-      "x": 570,
-      "y": 1020
+      "x": 435,
+      "y": 0
     },
     "dimensions": {}
   }

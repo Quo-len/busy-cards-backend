@@ -2,6 +2,7 @@ const db = require('../models');
 
 const Mindmap = db.Mindmap;
 const Participant = db.Participant;
+const Favorite = db.Favorite;
 
 module.exports = {
 	getAllMindmaps: async (req, res) => {
@@ -9,15 +10,35 @@ module.exports = {
 			const page = parseInt(req.query.page) || 1;
 			const limit = parseInt(req.query.limit) || 10;
 			// lastModified, createdAt
-			const { owner, participant, sortBy = 'lastModified', order = 'desc' } = req.query;
+			const { owner, participant, sortBy = 'lastModified', sortOrder = 'desc', isPublic, favorite } = req.query;
 
 			const sortOptions = {
-				[sortBy]: order === 'desc' ? -1 : 1,
+				[sortBy]: sortOrder === 'desc' ? -1 : 1,
 			};
 
 			const skip = (page - 1) * limit;
 
 			let query = {};
+
+			if (isPublic) {
+				if (isPublic === 'true') {
+					query.isPublic = true;
+				} else if (isPublic === 'false') {
+					query.isPublic = false;
+				}
+			}
+
+			if (favorite) {
+				const favorites = await Favorite.find({ user: favorite }).select('mindmap');
+				const favoriteMindmapIds = favorites.map((entry) => entry.mindmap);
+
+				if (Object.keys(query).length > 0 || owner || participant) {
+					query._id = { $in: favoriteMindmapIds };
+				} else {
+					query = { _id: { $in: favoriteMindmapIds } };
+				}
+			}
+
 			if (owner && participant) {
 				const participantEntries = await Participant.find({ user: participant }).select('mindmap');
 
@@ -78,7 +99,7 @@ module.exports = {
 		try {
 			const mindmap = await Mindmap.findById(req.params.id);
 			if (!mindmap) {
-				res.status(404).json({ error: 'Інтелект-карту не знайдено.' });
+				return res.status(404).json({ error: 'Інтелект-карту не знайдено.' });
 			}
 			res.status(200).json(mindmap);
 		} catch (error) {
@@ -99,7 +120,7 @@ module.exports = {
 		try {
 			const mindmap = await Mindmap.findByIdAndUpdate(req.params.id, req.body, { new: true });
 			if (!mindmap) {
-				res.status(404).json({ error: 'Інтелект-карту не знайдено.' });
+				return res.status(404).json({ error: 'Інтелект-карту не знайдено.' });
 			}
 			res.status(200).json(mindmap);
 		} catch (error) {
@@ -117,6 +138,4 @@ module.exports = {
 			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
-	// all mindmaps that user has access to
-	// all mindmaps that user owns
 };

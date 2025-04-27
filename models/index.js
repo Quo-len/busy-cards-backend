@@ -13,6 +13,19 @@ if (mongoose.models.User) {
 	});
 }
 
+const { CronJob } = require('cron');
+
+const deleteExpiredInvitationsJob = new CronJob('0 0 0 * * *', async () => {
+	try {
+		const result = await Invitation.deleteMany({ expiresAt: { $lte: new Date() } });
+		console.log(`Deleted ${result.deletedCount} expired invitations`);
+	} catch (error) {
+		console.error('Error deleting expired invitations:', error);
+	}
+});
+
+deleteExpiredInvitationsJob.start();
+
 module.exports = {
 	User,
 	Mindmap,

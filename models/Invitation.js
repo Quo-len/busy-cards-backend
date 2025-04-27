@@ -21,6 +21,11 @@ const invitationSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
+	accessLevel: {
+		type: String,
+		enum: ['Редактор', 'Коментатор', 'Глядач'],
+		required: true,
+	},
 	message: {
 		type: String,
 	},
@@ -33,19 +38,10 @@ const invitationSchema = new mongoose.Schema({
 		enum: ['Очікує', 'Принято', 'Відхилено'],
 		default: 'Очікує',
 	},
-	createdAt: {
+	expiresAt: {
 		type: Date,
-		default: Date.now,
-	},
-	acceptedAt: {
-		type: Date,
+		default: () => new Date(Date.now() + 24 * 60 * 60 * 1000),
 	},
 });
-
-//invitationSchema.virtual('Mindmap', {
-//    ref: 'Mindmap',
-//    localField: '_id',
-//    foreignField: 'mindmap'
-//});
 
 module.exports = mongoose.model('Invitation', invitationSchema);

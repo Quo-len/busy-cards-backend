@@ -90,7 +90,7 @@ module.exports = {
 				}
 			);
 			if (!participant) {
-				res.status(404).json({ error: 'Учасника не знайдено.' });
+				return res.status(404).json({ error: 'Учасника не знайдено.' });
 			}
 			res.status(200).json(participant);
 		} catch (error) {
