@@ -1,29 +1,152 @@
 {
-  "cd0b4739-1e77-4487-b36d-7fd37cd67dfa": {
-    "id": "cd0b4739-1e77-4487-b36d-7fd37cd67dfa",
+  "0b9ee1e1-a98b-4f1d-b9d3-775a70ec6181": {
+    "id": "0b9ee1e1-a98b-4f1d-b9d3-775a70ec6181",
     "type": "custom",
     "data": {
-      "label": "test",
+      "label": "custom node",
+      "width": 150,
+      "height": 50,
       "color": "red",
-      "width": 265,
-      "height": 150
+      "shape": "circle"
     },
     "position": {
-      "x": 660,
-      "y": -75
-    },
-    "dimensions": {}
+      "x": 110,
+      "y": 130
+    }
   },
-  "850fe1c6-cac1-4be0-9768-44c6c9a60600": {
-    "id": "850fe1c6-cac1-4be0-9768-44c6c9a60600",
+  "06b3b797-c3b0-4ee6-90fd-05eab20aaf5d": {
+    "id": "06b3b797-c3b0-4ee6-90fd-05eab20aaf5d",
     "type": "custom",
     "data": {
       "label": "custom node"
     },
     "position": {
-      "x": 435,
-      "y": 0
+      "x": 20,
+      "y": 310
     },
-    "dimensions": {}
+    "width": 103,
+    "height": 41
+  },
+  "74eca271-51f9-4902-a988-76fadc327171": {
+    "id": "74eca271-51f9-4902-a988-76fadc327171",
+    "type": "custom",
+    "data": {
+      "label": "custom node",
+      "shape": "circle",
+      "width": 150,
+      "height": 50
+    },
+    "position": {
+      "x": -190,
+      "y": 90
+    },
+    "width": 150,
+    "height": 50
+  },
+  "caf82cf3-a70c-49c7-a3ea-a4aa4a7fb62d": {
+    "id": "caf82cf3-a70c-49c7-a3ea-a4aa4a7fb62d",
+    "type": "custom",
+    "data": {
+      "label": "custom node"
+    },
+    "position": {
+      "x": -380,
+      "y": 120
+    },
+    "width": 103,
+    "height": 41
+  },
+  "80bcb208-ce8e-4bb2-b191-a8878f92fcc2": {
+    "id": "80bcb208-ce8e-4bb2-b191-a8878f92fcc2",
+    "type": "custom",
+    "data": {
+      "label": "gfhfghgghfghf"
+    },
+    "position": {
+      "x": -360,
+      "y": 240
+    },
+    "width": 115,
+    "height": 41
+  },
+  "7e42fb67-2c4e-438a-9bf8-d2ea6d7abb97": {
+    "id": "7e42fb67-2c4e-438a-9bf8-d2ea6d7abb97",
+    "type": "custom",
+    "data": {
+      "label": "custom node"
+    },
+    "position": {
+      "x": -165,
+      "y": 300
+    },
+    "width": 103,
+    "height": 41
+  },
+  "3ff64a53-63d4-415b-90b1-82033a0fa5e6": {
+    "id": "3ff64a53-63d4-415b-90b1-82033a0fa5e6",
+    "type": "custom",
+    "data": {
+      "label": "custom node"
+    },
+    "position": {
+      "x": -180,
+      "y": 405
+    },
+    "width": 103,
+    "height": 41
+  },
+  "5013a205-9728-4317-8484-7df4340b10c1": {
+    "id": "5013a205-9728-4317-8484-7df4340b10c1",
+    "type": "custom",
+    "data": {
+      "label": "custom node"
+    },
+    "position": {
+      "x": -330,
+      "y": -70
+    },
+    "width": 103,
+    "height": 41
+  },
+  "076c203a-a6f4-4cb5-9669-5116c8494081": {
+    "id": "076c203a-a6f4-4cb5-9669-5116c8494081",
+    "type": "actor",
+    "data": {
+      "label": "actor node",
+      "width": 80,
+      "height": 110
+    },
+    "position": {
+      "x": -640,
+      "y": 400
+    },
+    "width": 80,
+    "height": 110
+  },
+  "8e4aaa40-c964-4341-8700-20a42c6dc4f3": {
+    "id": "8e4aaa40-c964-4341-8700-20a42c6dc4f3",
+    "type": "mygroup",
+    "data": {
+      "label": "mygroup node"
+    },
+    "position": {
+      "x": -770,
+      "y": 150
+    },
+    "width": 200,
+    "height": 100
+  },
+  "2bb930e1-decd-422f-a8a8-fafc0e3ff6b0": {
+    "id": "2bb930e1-decd-422f-a8a8-fafc0e3ff6b0",
+    "type": "group",
+    "data": {
+      "label": "group node"
+    },
+    "position": {
+      "x": -590,
+      "y": 80
+    },
+    "width": 150,
+    "height": 22
   }
 }

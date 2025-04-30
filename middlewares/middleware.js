@@ -7,7 +7,7 @@ function verifyToken(req, res, next) {
 
 	if (!authHeader) {
 		return res.status(401).json({
-			message: 'No token, authorization denied',
+			message: 'Авторизаційні дані не надано, відмова в доступі.',
 		});
 	}
 
@@ -15,7 +15,7 @@ function verifyToken(req, res, next) {
 
 	if (!token) {
 		return res.status(401).json({
-			message: 'No token, authorization denied',
+			message: 'Авторизаційні дані не надано, відмова в доступі.',
 		});
 	}
 
@@ -25,7 +25,7 @@ function verifyToken(req, res, next) {
 		next();
 	} catch (error) {
 		if (error.name === 'TokenExpiredError') {
-			return res.status(401).json({ message: 'Token expired' });
+			return res.status(401).json({ message: 'Час авторизації сплинув' });
 		}
 		return res.status(401).json({ message: `Token is not valid: ${error.message}` });
 	}
@@ -40,7 +40,7 @@ function authorize(allowedRoles = []) {
 		const isOwner = String(userId) === String(targetId);
 
 		if (!req.user || (!isAdmin && !isOwner)) {
-			return res.status(403).json({ message: 'Access denied: insufficient permissions' });
+			return res.status(403).json({ message: 'Доступ відмовлено: недостатньо прав.' });
 		}
 		next();
 	};

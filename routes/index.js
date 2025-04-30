@@ -15,4 +15,7 @@ router.use('/participants', participantRoute);
 const favoriteRoute = require('./favoriteRouter');
 router.use('/favorites', favoriteRoute);
 
+const invitationRoute = require('./favoriteRouter');
+router.use('/invitations', invitationRoute);
+
 module.exports = router;

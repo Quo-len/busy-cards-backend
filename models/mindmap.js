@@ -8,9 +8,11 @@ const mindmapSchema = new mongoose.Schema(
 	{
 		title: {
 			type: String,
+			default: 'Нова інтелект-карта без назви',
 			required: true,
 		},
 		description: {
+			default: 'Опис відсутній.',
 			type: String,
 		},
 		owner: {
