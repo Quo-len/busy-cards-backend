@@ -21,7 +21,7 @@ module.exports = {
 			const participants = await Participant.find(filter).populate('user').select('-__v');
 
 			const result = participants.map((p) => ({
-				_id: p._id,
+				id: p.id,
 				mindmap: p.mindmap,
 				user: p.user.id,
 				username: p.user.username,

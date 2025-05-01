@@ -11,7 +11,7 @@ module.exports = {
 			const { email, password, username } = req.body;
 			const userExists = await User.findOne({ email: email });
 			if (userExists) {
-				return res.status(400).json({ error: 'Користувач під такоє пошною вже зареєстрований.' });
+				return res.status(400).json({ error: 'Користувач під такою пошною вже зареєстрований.' });
 			}
 
 			const salt = await bcrypt.genSalt(10);
@@ -92,7 +92,6 @@ module.exports = {
 			await user.save();
 			res.status(200).json({ message: 'Посилання для скидання пароля надіслано.' });
 		} catch (error) {
-			console.error('Error generating reset token:', error);
 			res.status(500).json({ error: 'Виникла помилка під час відновлення пароля.' });
 		}
 	},
@@ -119,7 +118,6 @@ module.exports = {
 
 			res.status(200).json({ message: 'Скидання пароля відбулося успішно.' });
 		} catch (error) {
-			console.error('Error resetting password:', error);
 			res.status(500).json({ error: 'Виникла помилка під час скидання пароля.' });
 		}
 	},

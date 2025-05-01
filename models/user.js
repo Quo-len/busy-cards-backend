@@ -7,6 +7,7 @@ const UserSchema = new Schema(
 			type: String,
 			required: true,
 			unique: true,
+			index: true,
 		},
 		username: {
 			type: String,
@@ -32,7 +33,12 @@ const UserSchema = new Schema(
 			type: Date,
 		},
 	},
-	{ strict: false }
+	{
+		toJSON: { virtuals: true },
+		toObject: { virtuals: true },
+		timestamps: true,
+		strict: false,
+	}
 );
 
 module.exports = mongoose.model('User', UserSchema);

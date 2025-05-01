@@ -10,7 +10,7 @@ module.exports = {
 			const page = parseInt(req.query.page) || 1;
 			const limit = parseInt(req.query.limit) || 10;
 			// lastModified, createdAt
-			const { owner, participant, sortBy = 'lastModified', sortOrder = 'desc', isPublic, favorite } = req.query;
+			const { owner, participant, sortBy = 'updatedAt', sortOrder = 'desc', isPublic, favorite } = req.query;
 
 			const sortOptions = {
 				[sortBy]: sortOrder === 'desc' ? -1 : 1,
@@ -44,7 +44,7 @@ module.exports = {
 
 				const participantMindmapIds = participantEntries.map((entry) => entry.mindmap);
 
-				query.$or = [{ owner }, { _id: { $in: participantMindmapIds } }];
+				query.$or = [{ owner }, { id: { $in: participantMindmapIds } }];
 			} else {
 				if (owner) {
 					query.owner = owner;
@@ -55,7 +55,7 @@ module.exports = {
 
 					const participantMindmapIds = participantEntries.map((entry) => entry.mindmap);
 
-					query._id = { $in: participantMindmapIds };
+					query.id = { $in: participantMindmapIds };
 				}
 			}
 
@@ -69,13 +69,13 @@ module.exports = {
 					populate: {
 						path: 'user',
 						model: 'User',
-						select: 'username email avatar',
+						select: 'id username email avatar',
 					},
 				})
 				.populate({
 					path: 'owner',
 					model: 'User',
-					select: '_id username email avatar',
+					select: 'id username email avatar',
 				});
 
 			const totalMindmaps = await Mindmap.countDocuments(query);
@@ -97,11 +97,19 @@ module.exports = {
 	},
 	getMindmap: async (req, res) => {
 		try {
-			const mindmap = await Mindmap.findById(req.params.id);
+			const mindmap = await Mindmap.findById(req.params.id).populate({
+				path: 'participants',
+				model: 'Participant',
+				populate: {
+					path: 'user',
+					model: 'User',
+					select: 'id username email avatar',
+				},
+			});
 			if (!mindmap) {
 				return res.status(404).json({ error: 'Інтелект-карту не знайдено.' });
 			}
-			res.status(200).json(mindmap);
+			res.status(200).json({ mindmap, role: req.role });
 		} catch (error) {
 			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}

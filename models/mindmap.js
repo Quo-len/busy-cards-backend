@@ -45,20 +45,13 @@ const mindmapSchema = new mongoose.Schema(
 			type: Boolean,
 			default: false,
 		},
-		lastModified: {
-			type: Date,
-			default: Date.now,
-		},
-		createdAt: {
-			type: Date,
-			default: Date.now,
-		},
 	},
 	{
 		toJSON: { virtuals: true },
 		toObject: { virtuals: true },
-	},
-	{ strict: false }
+		timestamps: true,
+		strict: false,
+	}
 );
 
 mindmapSchema.virtual('participants', {
@@ -71,8 +64,8 @@ mindmapSchema.pre('findOneAndDelete', async function (next) {
 	try {
 		const doc = await this.model.findOne(this.getFilter());
 		if (doc) {
-			await Favorite.deleteMany({ mindmap: doc._id });
-			await Participant.deleteMany({ mindmap: doc._id });
+			await Favorite.deleteMany({ mindmap: doc.id });
+			await Participant.deleteMany({ mindmap: doc.id });
 		}
 		next();
 	} catch (err) {

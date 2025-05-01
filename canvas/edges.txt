@@ -1,18 +1,10 @@
 {
-  "09a9cb4c-17dd-4e19-bd57-b19a7eaa62da": {
-    "id": "09a9cb4c-17dd-4e19-bd57-b19a7eaa62da",
+  "bf41d76d-b98e-44e3-a85e-98d0cf0d8164": {
+    "id": "bf41d76d-b98e-44e3-a85e-98d0cf0d8164",
     "type": "custom",
-    "source": "80bcb208-ce8e-4bb2-b191-a8878f92fcc2",
-    "target": "7e42fb67-2c4e-438a-9bf8-d2ea6d7abb97",
+    "source": "039ab373-c058-413d-8104-37275ab39514",
+    "target": "4f6f6861-dc54-4438-b1c0-a91fdfde4070",
     "sourceHandle": "right",
-    "targetHandle": "left"
-  },
-  "2157bd69-664a-42bf-9f50-b197bbda0774": {
-    "id": "2157bd69-664a-42bf-9f50-b197bbda0774",
-    "type": "custom",
-    "source": "80bcb208-ce8e-4bb2-b191-a8878f92fcc2",
-    "target": "076c203a-a6f4-4cb5-9669-5116c8494081",
-    "sourceHandle": "left",
-    "targetHandle": "left"
+    "targetHandle": "bottom"
   }
 }

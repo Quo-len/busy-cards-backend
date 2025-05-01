@@ -1,6 +1,7 @@
 const db = require('../models');
 
 const Invitation = db.Invitation;
+const Participant = db.Participant;
 
 module.exports = {
 	getAllInvitations: async (req, res) => {
@@ -41,16 +42,21 @@ module.exports = {
 				.populate({
 					path: 'mindmap',
 					model: 'Mindmap',
+					populate: {
+						path: 'owner',
+						model: 'User',
+						select: 'id username email avatar',
+					},
 				})
 				.populate({
 					path: 'sender',
 					model: 'User',
-					select: '_id username email avatar',
+					select: 'id username email avatar',
 				})
 				.populate({
 					path: 'receiver',
 					model: 'User',
-					select: '_id username email avatar',
+					select: 'id username email avatar',
 				});
 
 			const totalInvitations = await Invitation.countDocuments(query);
@@ -83,17 +89,44 @@ module.exports = {
 	},
 	sendInvitation: async (req, res) => {
 		try {
-			const { sender, receiver, title, message, accessLevel } = req.body;
-			const invitation = new Invitation(sender, receiver, title, message, accessLevel);
+			const { sender, receiver, title, mindmap, message, accessLevel } = req.body;
+			if (sender === receiver) {
+				return res.status(406).json({ error: 'Відправник не може співпадати з отримувачем.' });
+			}
+			console.log(receiver);
+			const participant = await Participant.findOne({ user: receiver, mindmap: mindmap });
+			if (participant) {
+				return res.status(403).json({ message: 'Користувач вже є учасником.' });
+			}
+			console.log(participant);
+
+			const invitation = new Invitation({ sender, receiver, title, mindmap, message, accessLevel });
 			await invitation.save();
-			res.status(201).json(invitation);
+			res.status(201).json({ message: 'Запрошення успішно відправлено.' });
 		} catch (error) {
 			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
 	updateInvitation: async (req, res) => {
 		try {
-			res.status(200).json({ message: 'Запрошення успішно оновлено.' });
+			const { id } = req.params.id;
+			const { accessLevel, receiver, mindmap, status } = req.body;
+			const invitation = await Invitation.findByIdAndUpdate(
+				id,
+				{ accessLevel, receiver, mindmap, status },
+				{ new: true }
+			);
+			if (!invitation) {
+				return res.status(404).json({ error: 'Запрошення не знайдено.' });
+			}
+			if (status === 'Принято') {
+				const participant = new Participant({
+					mindmap,
+					accessLevel,
+					user: receiver,
+				});
+				await participant.save();
+			} else res.status(200).json(invitation);
 		} catch (error) {
 			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}

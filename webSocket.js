@@ -210,7 +210,6 @@ utils.setPersistence({
 				{
 					nodes: nodes,
 					edges: edges,
-					lastModified: new Date(),
 				},
 				{ new: true, runValidators: false }
 			);
@@ -309,7 +308,6 @@ async function updateMindmapInDatabase(mindmapId, nodesMap, edgesMap) {
 			{
 				nodes: nodes,
 				edges: edges,
-				lastModified: new Date(),
 			},
 			{ new: true, runValidators: false }
 		);
@@ -486,7 +484,6 @@ const syncMindmapToDatabase = async (mindmapId, ydoc) => {
 			{
 				nodes: nodes,
 				edges: edges,
-				lastModified: new Date(),
 			},
 			{ new: true, runValidators: false }
 		);
@@ -503,6 +500,7 @@ const syncMindmapToDatabase = async (mindmapId, ydoc) => {
 	}
 };
 
+/////////////////////////////
 // app.get('/rooms/:roomName/content', (req, res) => {
 // 	const { roomName } = req.params;
 // 	const content = printRoomContent(roomName);
@@ -527,5 +525,327 @@ const syncMindmapToDatabase = async (mindmapId, ydoc) => {
 // 		res.json({ success: true, message: `Garbage collection triggered for room ${roomName}` });
 // 	} catch (error) {
 // 		res.status(500).json({ error: `Failed to trigger garbage collection: ${error.message}` });
+// 	}
+// });
+/////////////////////////////////////////////
+
+// const http = require('http');
+// const { Server } = require('socket.io');
+// const mongoose = require('mongoose');
+// const db = require('./models');
+// const Mindmap = db.Mindmap;
+// const config = require('./config');
+// const fs = require('fs');
+
+// // MongoDB configuration
+// const db_login = config.db_login;
+// const db_pass = config.db_pass;
+// const db_uri = `mongodb+srv://${db_login}:${db_pass}@busycardsclaster.7wkb9.mongodb.net/?retryWrites=true&w=majority&appName=BusyCardsClaster`;
+
+// // Server configuration
+// const port = config.ws_port;
+// const production = process.env.PRODUCTION != null;
+
+// // Connect mongoose to MongoDB
+// async function connect() {
+// 	try {
+// 		await mongoose.connect(db_uri);
+// 		console.log('Connected to MongoDB with mongoose');
+// 	} catch (error) {
+// 		console.log('Failed to connect to MongoDB with mongoose: ' + error);
+// 	}
+// }
+
+// connect();
+
+// // Track active mindmaps and their clients
+// const activeMindmaps = new Map();
+
+// // HTTP server
+// const server = http.createServer((request, response) => {
+// 	if (request.method === 'POST') {
+// 		let body = '';
+
+// 		request.on('data', (chunk) => {
+// 			body += chunk.toString();
+// 		});
+
+// 		request.on('end', () => {
+// 			try {
+// 				const jsonData = JSON.parse(body);
+// 				console.log('Received JSON data:', JSON.stringify(jsonData, null, 2));
+// 				response.writeHead(200, { 'Content-Type': 'application/json' });
+// 				response.end(JSON.stringify({ status: 'success', message: 'Data received' }));
+// 			} catch (error) {
+// 				console.error('Error parsing JSON:', error);
+// 				response.writeHead(400, { 'Content-Type': 'application/json' });
+// 				response.end(JSON.stringify({ status: 'error', message: 'Invalid JSON' }));
+// 			}
+// 		});
+// 	} else {
+// 		response.writeHead(200, { 'Content-Type': 'text/plain' });
+// 		response.end('okay');
+// 	}
+// });
+
+// // Create Socket.IO server
+// const io = new Server(server, {
+// 	cors: {
+// 		origin: '*',
+// 		methods: ['GET', 'POST'],
+// 	},
+// });
+
+// // Load mindmap from database or initialize new one
+// async function loadMindmap(mindmapId) {
+// 	try {
+// 		console.log(`Loading mindmap ${mindmapId} from database`);
+
+// 		const mindmap = await Mindmap.findById(mindmapId);
+// 		if (!mindmap) {
+// 			console.log(`No mindmap found with ID: ${mindmapId}`);
+// 			return { nodes: {}, edges: {} };
+// 		}
+
+// 		const nodes = mindmap.nodes ? JSON.parse(mindmap.nodes) : {};
+// 		const edges = mindmap.edges ? JSON.parse(mindmap.edges) : {};
+
+// 		console.log(`Loaded mindmap with ${Object.keys(nodes).length} nodes and ${Object.keys(edges).length} edges`);
+// 		return { nodes, edges };
+// 	} catch (error) {
+// 		console.error(`Error loading mindmap ${mindmapId}:`, error);
+// 		return { nodes: {}, edges: {} };
+// 	}
+// }
+
+// // Save mindmap state to database
+// async function saveMindmapToDatabase(mindmapId, nodes, edges) {
+// 	try {
+// 		const nodesJson = JSON.stringify(nodes, null, 2);
+// 		const edgesJson = JSON.stringify(edges, null, 2);
+
+// 		console.log(`Saving mindmap ${mindmapId} to database`);
+// 		console.log(`Nodes count: ${Object.keys(nodes).length}, Edges count: ${Object.keys(edges).length}`);
+
+// 		// For debugging: save to files
+// 		fs.writeFile('./canvas/nodes.txt', nodesJson, (err) => {
+// 			if (err) console.error(err);
+// 		});
+
+// 		fs.writeFile('./canvas/edges.txt', edgesJson, (err) => {
+// 			if (err) console.error(err);
+// 		});
+
+// 		const updatedMindmap = await Mindmap.findByIdAndUpdate(
+// 			mindmapId,
+// 			{
+// 				nodes: nodesJson,
+// 				edges: edgesJson,
+// 			},
+// 			{ new: true, runValidators: false }
+// 		);
+
+// 		await updatedMindmap.save();
+// 		console.log(`Mindmap ${mindmapId} saved successfully`);
+// 	} catch (error) {
+// 		console.error(`Error saving mindmap ${mindmapId}:`, error);
+// 	}
+// }
+
+// // Socket.IO connection handler
+// io.on('connection', async (socket) => {
+// 	console.log(`Client connected: ${socket.id}`);
+
+// 	// Handle joining a mindmap room
+// 	socket.on('join-mindmap', async ({ mindmapId }) => {
+// 		const roomName = `mindmap-${mindmapId}`;
+
+// 		// Join the socket to the room
+// 		socket.join(roomName);
+// 		console.log(`Client ${socket.id} joined ${roomName}`);
+
+// 		// Initialize or get existing mindmap data
+// 		if (!activeMindmaps.has(roomName)) {
+// 			const { nodes, edges } = await loadMindmap(mindmapId);
+// 			activeMindmaps.set(roomName, {
+// 				nodes,
+// 				edges,
+// 				clients: new Set(),
+// 				lastActivity: Date.now(),
+// 				saveInterval: setInterval(() => {
+// 					const data = activeMindmaps.get(roomName);
+// 					if (data) {
+// 						saveMindmapToDatabase(mindmapId, data.nodes, data.edges);
+// 					}
+// 				}, 30000), // Save every 30 seconds
+// 			});
+// 		}
+
+// 		const mindmapData = activeMindmaps.get(roomName);
+// 		mindmapData.clients.add(socket.id);
+
+// 		// Send initial state to the client
+// 		socket.emit('init-state', {
+// 			nodes: mindmapData.nodes,
+// 			edges: mindmapData.edges,
+// 		});
+
+// 		console.log(
+// 			`Sent initial state to client ${socket.id} with ${Object.keys(mindmapData.nodes).length} nodes and ${
+// 				Object.keys(mindmapData.edges).length
+// 			} edges`
+// 		);
+// 	});
+
+// 	// Handle node updates
+// 	socket.on('node-update', ({ mindmapId, node, action }) => {
+// 		const roomName = `mindmap-${mindmapId}`;
+// 		const mindmapData = activeMindmaps.get(roomName);
+
+// 		if (!mindmapData) return;
+
+// 		console.log(`${action} node ${node.id} in ${roomName}`);
+
+// 		// Update local state based on action
+// 		if (action === 'add' || action === 'update') {
+// 			mindmapData.nodes[node.id] = node;
+// 		} else if (action === 'delete') {
+// 			delete mindmapData.nodes[node.id];
+// 		}
+
+// 		mindmapData.lastActivity = Date.now();
+
+// 		// Broadcast to all clients in room except sender
+// 		socket.to(roomName).emit('node-updated', { node, action });
+// 	});
+
+// 	// Handle edge updates
+// 	socket.on('edge-update', ({ mindmapId, edge, action }) => {
+// 		const roomName = `mindmap-${mindmapId}`;
+// 		const mindmapData = activeMindmaps.get(roomName);
+
+// 		if (!mindmapData) return;
+
+// 		console.log(`${action} edge ${edge.id} in ${roomName}`);
+
+// 		// Update local state based on action
+// 		if (action === 'add' || action === 'update') {
+// 			mindmapData.edges[edge.id] = edge;
+// 		} else if (action === 'delete') {
+// 			delete mindmapData.edges[edge.id];
+// 		}
+
+// 		mindmapData.lastActivity = Date.now();
+
+// 		// Broadcast to all clients in room except sender
+// 		socket.to(roomName).emit('edge-updated', { edge, action });
+// 	});
+
+// 	// Handle debug/state requests
+// 	socket.on('request-state', ({ mindmapId }) => {
+// 		const roomName = `mindmap-${mindmapId}`;
+// 		const mindmapData = activeMindmaps.get(roomName);
+
+// 		if (mindmapData) {
+// 			socket.emit('state-info', {
+// 				nodeCount: Object.keys(mindmapData.nodes).length,
+// 				edgeCount: Object.keys(mindmapData.edges).length,
+// 				clientCount: mindmapData.clients.size,
+// 			});
+
+// 			console.log(`State requested for ${roomName}:`, {
+// 				nodeCount: Object.keys(mindmapData.nodes).length,
+// 				edgeCount: Object.keys(mindmapData.edges).length,
+// 				clientCount: mindmapData.clients.size,
+// 			});
+// 		}
+// 	});
+
+// 	// Handle forced sync requests
+// 	socket.on('force-sync', async ({ mindmapId }) => {
+// 		const roomName = `mindmap-${mindmapId}`;
+// 		const mindmapData = activeMindmaps.get(roomName);
+
+// 		if (mindmapData) {
+// 			// Save to database
+// 			await saveMindmapToDatabase(mindmapId, mindmapData.nodes, mindmapData.edges);
+
+// 			// Notify client
+// 			socket.emit('sync-complete', {
+// 				success: true,
+// 				message: 'Mindmap synchronized to database',
+// 				timestamp: new Date(),
+// 			});
+// 		}
+// 	});
+
+// 	// Handle client disconnect
+// 	socket.on('disconnect', () => {
+// 		console.log(`Client disconnected: ${socket.id}`);
+
+// 		// Find and remove client from any mindmap rooms
+// 		for (const [roomName, data] of activeMindmaps.entries()) {
+// 			if (data.clients.has(socket.id)) {
+// 				data.clients.delete(socket.id);
+// 				console.log(`Removed client ${socket.id} from ${roomName}. ${data.clients.size} clients remaining.`);
+
+// 				// If no clients left, schedule cleanup
+// 				if (data.clients.size === 0) {
+// 					const mindmapId = roomName.substring(8); // Remove 'mindmap-' prefix
+// 					console.log(`No clients remaining in ${roomName}, scheduling cleanup`);
+
+// 					// Schedule cleanup after 2 minutes of inactivity
+// 					setTimeout(() => {
+// 						const currentData = activeMindmaps.get(roomName);
+// 						if (currentData && currentData.clients.size === 0) {
+// 							// Final save before cleanup
+// 							saveMindmapToDatabase(mindmapId, currentData.nodes, currentData.edges);
+
+// 							// Clean up resources
+// 							clearInterval(currentData.saveInterval);
+// 							activeMindmaps.delete(roomName);
+// 							console.log(`Cleaned up inactive mindmap ${roomName}`);
+// 						}
+// 					}, 120000); // 2 minutes
+// 				}
+// 			}
+// 		}
+// 	});
+// });
+
+// // Start the server
+// server.listen(port, () => {
+// 	console.log(`Socket.IO server listening on port ${port} ${production ? '(production)' : ''}`);
+// });
+
+// // Graceful shutdown handler
+// process.on('SIGINT', async () => {
+// 	console.log('SIGINT received. Syncing mindmaps before shutdown...');
+
+// 	const savePromises = [];
+
+// 	// Save all active mindmaps to database
+// 	for (const [roomName, data] of activeMindmaps.entries()) {
+// 		const mindmapId = roomName.substring(8); // Remove 'mindmap-' prefix
+// 		savePromises.push(saveMindmapToDatabase(mindmapId, data.nodes, data.edges));
+// 		clearInterval(data.saveInterval);
+// 	}
+
+// 	try {
+// 		await Promise.all(savePromises);
+// 		console.log('All mindmaps synced to database');
+
+// 		// Close server and database connection
+// 		io.close(() => {
+// 			console.log('Socket.IO server closed.');
+
+// 			mongoose.connection.close(false, () => {
+// 				console.log('MongoDB connection closed.');
+// 				process.exit(0);
+// 			});
+// 		});
+// 	} catch (err) {
+// 		console.error('Error during final sync:', err);
+// 		process.exit(1);
 // 	}
 // });

@@ -18,7 +18,7 @@ module.exports = {
 						populate: {
 							path: 'user',
 							model: 'User',
-							select: 'username email avatar _id',
+							select: 'username email avatar id',
 						},
 					},
 				})
@@ -27,7 +27,7 @@ module.exports = {
 					populate: {
 						path: 'owner',
 						model: 'User',
-						select: 'username email avatar _id',
+						select: 'username email avatar id',
 					},
 				})
 				.select('-__v');
