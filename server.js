@@ -7,17 +7,14 @@ const routes = require('./routes');
 require('./webSocket');
 require('./database');
 
-const host = config.ip;
 const port = config.port;
-
 const app = express();
 
-// CORS Configuration
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use(
 	cors({
-		origin: ['http://localhost:5173', 'http://localhost:3000'], // Add your React app's URLs
+		origin: ['http://localhost:5173', 'http://localhost:3000'],
 		methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 		allowedHeaders: ['Content-Type', 'Authorization'],
 	})
@@ -29,8 +26,8 @@ app.get('/', (req, res) => {
 	res.json({ message: 'Server is running!', status: 'ok' });
 });
 
-app.listen(port, host, () => {
-	console.log(`Server running on http://${host}:${port}`);
+app.listen(port, '0.0.0.0', () => {
+	console.log(`Server running on port ${port}`);
 });
 
 // const express = require('express');

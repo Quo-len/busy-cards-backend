@@ -77,12 +77,11 @@ module.exports = {
 
 			try {
 				const { email, password, username } = req.body;
-
 				const user = new User({
 					email,
 					password,
 					username,
-					avatar: req.file ? `http://${config.address}/uploads/${req.file.filename}` : '',
+					avatar: req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : '',
 				});
 
 				await user.save();
@@ -115,7 +114,7 @@ module.exports = {
 
 				const updateData = {
 					...req.body,
-					avatar: req.file ? `http://${config.address}/uploads/${req.file.filename}` : '',
+					avatar: req.file ? `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}` : '',
 				};
 
 				const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });

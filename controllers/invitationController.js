@@ -9,7 +9,7 @@ module.exports = {
 			const page = parseInt(req.query.page) || 1;
 			const limit = parseInt(req.query.limit) || 10;
 			// lastModified, createdAt
-			const { receiver, sender, sortBy = 'lastModified', sortOrder = 'desc', isPublic, favorite } = req.query;
+			const { receiver, sender, sortBy = 'lastModified', sortOrder = 'desc' } = req.query;
 
 			const sortOptions = {
 				[sortBy]: sortOrder === 'desc' ? -1 : 1,
@@ -18,14 +18,6 @@ module.exports = {
 			const skip = (page - 1) * limit;
 
 			let query = {};
-
-			if (isPublic) {
-				if (isPublic === 'true') {
-					query.isPublic = true;
-				} else if (isPublic === 'false') {
-					query.isPublic = false;
-				}
-			}
 
 			if (receiver) {
 				query.receiver = receiver;

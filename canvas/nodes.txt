@@ -1,38 +1,57 @@
 {
-  "b2032850-d172-4812-8226-3ae024a7c7a0": {
-    "id": "b2032850-d172-4812-8226-3ae024a7c7a0",
-    "type": "image",
-    "data": {
-      "label": "image node",
-      "image": "https://i.ytimg.com/vi/JubYo1AOPAA/maxresdefault.jpg"
-    },
+  "a8874c6e-9dcf-4a30-bb65-e3dff11f605a": {
+    "id": "a8874c6e-9dcf-4a30-bb65-e3dff11f605a",
     "position": {
-      "x": 860,
-      "y": -290
-    }
+      "x": 821.6759379866039,
+      "y": 537.8263643789649
+    },
+    "data": {
+      "label": "custom node"
+    },
+    "type": "custom"
   },
-  "039ab373-c058-413d-8104-37275ab39514": {
-    "id": "039ab373-c058-413d-8104-37275ab39514",
+  "0b121a91-07f0-4ae1-9776-e77010cb5e60": {
+    "id": "0b121a91-07f0-4ae1-9776-e77010cb5e60",
+    "position": {
+      "x": 821.6759379866039,
+      "y": 537.8263643789649
+    },
+    "data": {
+      "label": "custom node"
+    },
+    "type": "custom"
+  },
+  "c2474c4e-4ed7-4acc-ba3a-3bc89cefdfbe": {
+    "id": "c2474c4e-4ed7-4acc-ba3a-3bc89cefdfbe",
+    "position": {
+      "x": 821.6759379866039,
+      "y": 537.8263643789649
+    },
+    "data": {
+      "label": "custom node"
+    },
+    "type": "custom"
+  },
+  "ad4367d0-c6a5-46ea-812c-fb2062601fac": {
+    "id": "ad4367d0-c6a5-46ea-812c-fb2062601fac",
+    "position": {
+      "x": 821.6759379866039,
+      "y": 537.8263643789649
+    },
+    "data": {
+      "label": "custom node"
+    },
+    "type": "custom"
+  },
+  "ba4b2da9-036a-4f49-a926-e45a008c3768": {
+    "id": "ba4b2da9-036a-4f49-a926-e45a008c3768",
     "type": "custom",
     "data": {
       "label": "custom node"
     },
     "position": {
-      "x": -120,
-      "y": 100
-    },
-    "width": 103,
-    "height": 41
-  },
-  "4f6f6861-dc54-4438-b1c0-a91fdfde4070": {
-    "id": "4f6f6861-dc54-4438-b1c0-a91fdfde4070",
-    "type": "custom",
-    "position": {
-      "x": -140,
-      "y": -30
-    },
-    "data": {
-      "label": "custom node"
+      "x": 900,
+      "y": 430
     }
   }
 }

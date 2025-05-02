@@ -113,46 +113,10 @@ utils.setupWSConnection = (conn, req, { docName: roomName = req.url.slice(1).spl
 		}
 	});
 
-	// Call the original connection setup
 	originalSetupWSConnection(conn, req, { docName: roomName, gc });
 };
 
-// add here users handle
 wss.on('connection', utils.setupWSConnection);
-
-// ws.on('close', () => {
-// 	if (mindmapDocs.has(mindmapId)) {
-// 		const roomData = mindmapDocs.get(mindmapId);
-// 		roomData.clients.delete(ws);
-// 		roomData.lastActivity = Date.now();
-
-// 		console.log(`Client disconnected. ${roomData.clients.size} clients remaining for mindmap ${mindmapId}`);
-
-// 		// If no clients left, schedule cleanup
-// 		if (roomData.clients.size === 0) {
-// 			console.log(`Last client disconnected from mindmap ${mindmapId}, scheduling cleanup`);
-
-// 			// Final sync before potential cleanup
-// 			syncMindmapToDatabase(mindmapId, roomData.doc);
-
-// 			// Schedule cleanup after 2 minutes of inactivity
-// 			setTimeout(() => {
-// 				const currentRoomData = mindmapDocs.get(mindmapId);
-// 				if (currentRoomData && currentRoomData.clients.size === 0) {
-// 					// Do one final sync
-// 					syncMindmapToDatabase(mindmapId, currentRoomData.doc);
-
-// 					// Clean up resources
-// 					clearInterval(currentRoomData.syncInterval);
-// 					currentRoomData.doc.destroy();
-// 					mindmapDocs.delete(mindmapId);
-
-// 					console.log(`Cleaned up inactive mindmap document ${mindmapId}`);
-// 				}
-// 			}, 120000); // 2 minutes
-// 		}
-// 	}
-// });
 
 server.on('upgrade', (request, socket, head) => {
 	const handleAuth = (ws) => {
@@ -161,103 +125,27 @@ server.on('upgrade', (request, socket, head) => {
 	wss.handleUpgrade(request, socket, head, handleAuth);
 });
 
-const fs = require('fs');
-
-// Configure Y.js persistence with enhanced logging
 utils.setPersistence({
 	bindState: async (docName, ydoc) => {
 		try {
 			console.log(`\n===== BINDING Y.js DOCUMENT: ${docName} =====`);
-
-			// Store the document in our map for later access
-			mindmapRooms.set(docName, ydoc);
 
 			const persistedYdoc = await persistence.getYDoc(docName);
 			const newUpdates = Y.encodeStateAsUpdate(ydoc);
 			await persistence.storeUpdate(docName, newUpdates);
 			Y.applyUpdate(ydoc, Y.encodeStateAsUpdate(persistedYdoc));
 
-			// Log initial state of `node`s and edges
 			const nodesMap = ydoc.getMap('nodes');
 			const edgesMap = ydoc.getMap('edges');
 
-			console.log('FINAL NODES:', JSON.stringify(Array.from(nodesMap.entries()), null, 2));
-			console.log('FINAL EDGES:', JSON.stringify(Array.from(edgesMap.entries()), null, 2));
+			//	console.log('FINAL NODES:', JSON.stringify(Array.from(nodesMap.entries()), null, 2));
+			//	console.log('FINAL EDGES:', JSON.stringify(Array.from(edgesMap.entries()), null, 2));
 
 			const mindmapId = docName.startsWith('mindmap-') ? docName.substring(8) : null;
 
-			const nodes = JSON.stringify(Object.fromEntries(nodesMap), null, 2);
-			const edges = JSON.stringify(Object.fromEntries(edgesMap), null, 2);
-
-			fs.writeFile('./canvas/nodes.txt', nodes, (err) => {
-				if (err) {
-					console.error(err);
-				} else {
-					// file written successfully
-				}
-			});
-
-			fs.writeFile('./canvas/edges.txt', edges, (err) => {
-				if (err) {
-					console.error(err);
-				} else {
-					// file written successfully
-				}
-			});
-
-			const updatedMindmap = await Mindmap.findByIdAndUpdate(
-				mindmapId,
-				{
-					nodes: nodes,
-					edges: edges,
-				},
-				{ new: true, runValidators: false }
-			);
-			await updatedMindmap.save();
-
-			// Setup observers for nodes and edges maps
-			nodesMap.observe((event) => {
-				console.log(`\n===== NODES UPDATED IN ${docName} =====`);
-
-				// Track deleted keys
-				const deletedKeys = [];
-				event.changes.keys.forEach((change, key) => {
-					if (change.action === 'delete') {
-						deletedKeys.push(key);
-						console.log(`Node deleted: ${key}`);
-					}
-				});
-
-				// If we have deletions, update the database right away
-				if (deletedKeys.length > 0 && mindmapId) {
-					updateMindmapInDatabase(mindmapId, nodesMap, edgesMap);
-				}
-			});
-
-			edgesMap.observe((event) => {
-				console.log(`\n===== EDGES UPDATED IN ${docName} =====`);
-
-				const changedKeys = Array.from(event.changes.keys.entries());
-				// Track deleted keys
-				const deletedKeys = [];
-				event.changes.keys.forEach((change, key) => {
-					console.log('ff ' + change.action);
-					if (change.action === 'delete') {
-						deletedKeys.push(key);
-						console.log(`Edge deleted: ${key}`);
-					}
-				});
-
-				// If we have deletions, update the database right away
-				if (deletedKeys.length > 0 && mindmapId) {
-					updateMindmapInDatabase(mindmapId, nodesMap, edgesMap);
-				}
-			});
-			// Setup document update observer
 			ydoc.on('update', async (update, origin, doc) => {
 				console.log(`\n===== DOCUMENT ${docName} UPDATED =====`);
 
-				// Store the update
 				await persistence.storeUpdate(docName, update);
 
 				// Update the database with the current state
@@ -275,18 +163,15 @@ utils.setPersistence({
 		}
 	},
 	writeState: async (docName, ydoc) => {
-		console.log(`\n===== WRITING DOCUMENT STATE: ${docName} =====`);
-
-		// Log final state before document is closed
 		const nodesMap = ydoc.getMap('nodes');
 		const edgesMap = ydoc.getMap('edges');
 
-		//	console.log('FINAL NODES:', JSON.stringify(Array.from(nodesMap.entries()), null, 2));
-		//	console.log('FINAL EDGES:', JSON.stringify(Array.from(edgesMap.entries()), null, 2));
+		const mindmapId = docName.startsWith('mindmap-') ? docName.substring(8) : null;
 
-		console.log(`===== WRITE COMPLETE FOR ${docName} =====\n`);
+		if (mindmapId) {
+			updateMindmapInDatabase(mindmapId, nodesMap, edgesMap);
+		}
 
-		// Remove from our documents map
 		mindmapRooms.delete(docName);
 
 		return new Promise((resolve) => {
@@ -324,77 +209,6 @@ server.listen(wsPort);
 console.log(
 	`Y.js WebSocket server with MongoDB persistence listening on port ${wsPort} ${production ? '(production)' : ''}`
 );
-
-const printRoomContent = (roomName) => {
-	const doc = docs.get(roomName);
-	if (!doc) {
-		return { error: `Room ${roomName} not found` };
-	}
-
-	try {
-		// Get nodes and edges from the Y.js shared document
-		const nodesMap = doc.getMap('nodes');
-		const edgesMap = doc.getMap('edges');
-
-		const nodes = Array.from(nodesMap.entries()).map(([id, node]) => {
-			// Convert SharedType to plain object if needed
-			return typeof node.toJSON === 'function' ? node.toJSON() : node;
-		});
-
-		const edges = Array.from(edgesMap.entries()).map(([id, edge]) => {
-			return typeof edge.toJSON === 'function' ? edge.toJSON() : edge;
-		});
-
-		// Log to server console
-		console.log(`Room ${roomName} content:`);
-		console.log(`Nodes (${nodes.length}):`, JSON.stringify(nodes, null, 2));
-		console.log(`Edges (${edges.length}):`, JSON.stringify(edges, null, 2));
-
-		return {
-			roomName,
-			nodeCount: nodes.length,
-			edgeCount: edges.length,
-			nodes,
-			edges,
-			connectionCount: connections.get(roomName)?.size || 0,
-		};
-	} catch (error) {
-		console.error(`Error printing room ${roomName} content:`, error);
-		return { error: `Error retrieving content: ${error.message}` };
-	}
-};
-
-// Graceful shutdown handler
-process.on('SIGINT', async () => {
-	console.log('SIGINT received. Syncing mindmaps before shutdown...');
-
-	const syncPromises = [];
-
-	// Sync all active documents to database before shutting down
-	mindmapRooms.forEach(({ doc, syncInterval }, mindmapId) => {
-		clearInterval(syncInterval);
-		syncPromises.push(syncMindmapToDatabase(mindmapId, doc));
-	});
-
-	try {
-		await Promise.all(syncPromises);
-		console.log('All mindmaps synced to database');
-
-		// Close WebSocket server
-		wss.close(() => {
-			console.log('WebSocket server closed.');
-
-			// Close database connection
-			mongoose.connection.close(false, () => {
-				console.log('MongoDB connection closed.');
-				process.exit(0);
-			});
-		});
-	} catch (err) {
-		console.error('Error during final sync:', err);
-		process.exit(1);
-	}
-});
 
 async function initializeDocFromDatabase(mindmapId, ydoc) {
 	try {
@@ -499,6 +313,37 @@ const syncMindmapToDatabase = async (mindmapId, ydoc) => {
 		console.error(error.stack);
 	}
 };
+
+process.on('SIGINT', async () => {
+	console.log('SIGINT received. Syncing mindmaps before shutdown...');
+
+	const syncPromises = [];
+
+	// Sync all active documents to database before shutting down
+	mindmapRooms.forEach(({ doc, syncInterval }, mindmapId) => {
+		clearInterval(syncInterval);
+		syncPromises.push(syncMindmapToDatabase(mindmapId, doc));
+	});
+
+	try {
+		await Promise.all(syncPromises);
+		console.log('All mindmaps synced to database');
+
+		// Close WebSocket server
+		wss.close(() => {
+			console.log('WebSocket server closed.');
+
+			// Close database connection
+			mongoose.connection.close(false, () => {
+				console.log('MongoDB connection closed.');
+				process.exit(0);
+			});
+		});
+	} catch (err) {
+		console.error('Error during final sync:', err);
+		process.exit(1);
+	}
+});
 
 /////////////////////////////
 // app.get('/rooms/:roomName/content', (req, res) => {
