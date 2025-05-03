@@ -148,7 +148,6 @@ utils.setPersistence({
 
 				await persistence.storeUpdate(docName, update);
 
-				// Update the database with the current state
 				if (mindmapId) {
 					updateMindmapInDatabase(mindmapId, nodesMap, edgesMap);
 				}
@@ -188,16 +187,19 @@ async function updateMindmapInDatabase(mindmapId, nodesMap, edgesMap) {
 		console.log(`Updating mindmap ${mindmapId} in database`);
 		console.log(`Nodes count: ${nodesMap.size}, Edges count: ${edgesMap.size}`);
 
-		const updatedMindmap = await Mindmap.findByIdAndUpdate(
-			mindmapId,
-			{
-				nodes: nodes,
-				edges: edges,
-			},
-			{ new: true, runValidators: false }
-		);
-		await updatedMindmap.save();
-
+		try {
+			const updatedMindmap = await Mindmap.findByIdAndUpdate(
+				mindmapId,
+				{
+					nodes: nodes,
+					edges: edges,
+				},
+				{ new: true, runValidators: false }
+			);
+			await updatedMindmap.save();
+		} catch (error) {
+			console.log('Mindmap not found.');
+		}
 		console.log(`Mindmap ${mindmapId} updated successfully`);
 	} catch (error) {
 		console.error(`Error updating mindmap ${mindmapId}:`, error);
