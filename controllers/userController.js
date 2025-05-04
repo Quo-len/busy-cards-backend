@@ -48,10 +48,19 @@ module.exports = {
 	getUser: async (req, res) => {
 		try {
 			const userId = req.params.userId;
+			const log = req.query.log === 'true';
 			const user = await User.findById(userId);
+
 			if (!user) {
 				return res.status(404).json({ error: 'Користувача не знайдено.' });
 			}
+
+			if (log) {
+				console.log('logg');
+				user.updatedAt = Date.now();
+				await user.save();
+			}
+
 			res.status(200).json(user);
 		} catch (error) {
 			res.status(500).json({ error: `Помилка серверу: ${error.message}` });

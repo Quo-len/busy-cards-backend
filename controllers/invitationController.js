@@ -9,7 +9,7 @@ module.exports = {
 			const page = parseInt(req.query.page) || 1;
 			const limit = parseInt(req.query.limit) || 10;
 			// lastModified, createdAt
-			const { receiver, sender, sortBy = 'lastModified', sortOrder = 'desc' } = req.query;
+			const { receiver, sender, status, sortBy = 'lastModified', sortOrder = 'desc' } = req.query;
 
 			const sortOptions = {
 				[sortBy]: sortOrder === 'desc' ? -1 : 1,
@@ -21,6 +21,10 @@ module.exports = {
 
 			if (receiver) {
 				query.receiver = receiver;
+			}
+
+			if (status) {
+				query.status = status;
 			}
 
 			if (sender) {
@@ -70,7 +74,8 @@ module.exports = {
 	},
 	getInvitation: async (req, res) => {
 		try {
-			const invitation = await Invitation.findById(req.params.id);
+			const { id } = req.params;
+			const invitation = await Invitation.findById(id);
 			if (!invitation) {
 				return res.status(404).json({ error: 'Запрошення не знайдено.' });
 			}
@@ -85,12 +90,10 @@ module.exports = {
 			if (sender === receiver) {
 				return res.status(406).json({ error: 'Відправник не може співпадати з отримувачем.' });
 			}
-			console.log(receiver);
 			const participant = await Participant.findOne({ user: receiver, mindmap: mindmap });
 			if (participant) {
 				return res.status(403).json({ message: 'Користувач вже є учасником.' });
 			}
-			console.log(participant);
 
 			const invitation = new Invitation({ sender, receiver, title, mindmap, message, accessLevel });
 			await invitation.save();
@@ -101,28 +104,43 @@ module.exports = {
 	},
 	updateInvitation: async (req, res) => {
 		try {
-			const { id } = req.params.id;
-			const { accessLevel, receiver, mindmap, status } = req.body;
-			const invitation = await Invitation.findByIdAndUpdate(
-				id,
-				{ accessLevel, receiver, mindmap, status },
-				{ new: true }
-			);
+			const { id } = req.params;
+			const { status } = req.body;
+
+			console.log('Updating invitation with ID:', id);
+
+			const invitation = await Invitation.findByIdAndUpdate(id, req.body, { new: true });
+
 			if (!invitation) {
 				return res.status(404).json({ error: 'Запрошення не знайдено.' });
 			}
+
 			if (status === 'Принято') {
-				const participant = new Participant({
-					mindmap,
-					accessLevel,
-					user: receiver,
+				const existingParticipant = await Participant.findOne({
+					mindmap: invitation.mindmap,
+					user: invitation.receiver,
 				});
-				await participant.save();
-			} else res.status(200).json(invitation);
+
+				if (existingParticipant) {
+					existingParticipant.accessLevel = invitation.accessLevel;
+					await existingParticipant.save();
+				} else {
+					const participant = new Participant({
+						mindmap: invitation.mindmap,
+						accessLevel: invitation.accessLevel,
+						user: invitation.receiver,
+					});
+					await participant.save();
+				}
+			}
+
+			return res.status(200).json(invitation);
 		} catch (error) {
+			console.error('Server error:', error);
 			res.status(500).json({ error: `Помилка серверу: ${error.message}` });
 		}
 	},
+
 	deleteInvitation: async (req, res) => {
 		try {
 			const invitation = await Invitation.findByIdAndDelete(req.params.id);

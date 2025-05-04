@@ -21,16 +21,9 @@ const UserSchema = new Schema(
 			type: String,
 			required: true,
 		},
-		createdAt: {
-			type: Date,
-			default: Date.now,
-		},
 		bio: {
 			type: String,
 			default: 'Опис відсутній',
-		},
-		lastLogin: {
-			type: Date,
 		},
 	},
 	{

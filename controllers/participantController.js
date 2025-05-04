@@ -20,16 +20,18 @@ module.exports = {
 
 			const participants = await Participant.find(filter).populate('user').select('-__v');
 
-			const result = participants.map((p) => ({
-				id: p.id,
-				mindmap: p.mindmap,
-				user: p.user.id,
-				username: p.user.username,
-				avatar: p.user.avatar,
-				email: p.user.email,
-				accessLevel: p.accessLevel,
-				joinedAt: p.joinedAt,
-			}));
+			const result = participants
+				.filter((p) => p.user)
+				.map((p) => ({
+					id: p.id,
+					mindmap: p.mindmap,
+					user: p.user.id,
+					username: p.user.username,
+					avatar: p.user.avatar,
+					email: p.user.email,
+					accessLevel: p.accessLevel,
+					joinedAt: p.joinedAt,
+				}));
 			res.status(200).json(result);
 		} catch (error) {
 			res.status(500).json({ error: `Помилка серверу: ${error.message}` });

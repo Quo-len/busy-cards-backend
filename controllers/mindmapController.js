@@ -44,7 +44,7 @@ module.exports = {
 
 				const participantMindmapIds = participantEntries.map((entry) => entry.mindmap);
 
-				query.$or = [{ owner }, { id: { $in: participantMindmapIds } }];
+				query.$or = [{ owner }, { _id: { $in: participantMindmapIds } }];
 			} else {
 				if (owner) {
 					query.owner = owner;
@@ -55,7 +55,7 @@ module.exports = {
 
 					const participantMindmapIds = participantEntries.map((entry) => entry.mindmap);
 
-					query.id = { $in: participantMindmapIds };
+					query._id = { $in: participantMindmapIds };
 				}
 			}
 
