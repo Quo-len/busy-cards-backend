@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
 const Favorite = require('./Favorite'); // adjust path if needed
 const Participant = require('./Participant'); // adjust path if needed
 
@@ -20,27 +19,16 @@ const mindmapSchema = new mongoose.Schema(
 			ref: 'User',
 			required: true,
 		},
-		nodes: [
-			{
-				id: String,
-				type: String,
-				position: {
-					x: Number,
-					y: Number,
-				},
-				data: Schema.Types.Mixed,
-			},
-		],
-		edges: [
-			{
-				id: String,
-				source: String,
-				target: String,
-				type: String,
-				sourceHandle: String,
-				targetHandle: String,
-			},
-		],
+		// Change from array to mixed object
+		nodes: {
+			type: Schema.Types.Mixed,
+			default: {},
+		},
+		// Change from array to mixed object
+		edges: {
+			type: Schema.Types.Mixed,
+			default: {},
+		},
 		isPublic: {
 			type: Boolean,
 			default: false,
