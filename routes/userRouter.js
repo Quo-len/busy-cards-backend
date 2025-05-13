@@ -6,6 +6,8 @@ const { verifyToken, authorize } = require('../middlewares/middleware');
 router.get('/', userController.getAllUsers);
 router.post('/', userController.addUser);
 
+router.get('/email/:email', userController.getUserEmail);
+
 router
 	.route('/:userId')
 	.get(userController.getUser)

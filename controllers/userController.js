@@ -56,7 +56,6 @@ module.exports = {
 			}
 
 			if (log) {
-				console.log('logg');
 				user.updatedAt = Date.now();
 				await user.save();
 			}
@@ -68,7 +67,7 @@ module.exports = {
 	},
 	getUserEmail: async (req, res) => {
 		try {
-			const { email } = req.params.email;
+			const email = req.params.email;
 			const user = await User.findOne({ email });
 			if (!user) {
 				return res.status(404).json({ error: 'Користувача з такою поштою не знайдено.' });

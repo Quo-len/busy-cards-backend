@@ -5,6 +5,8 @@ const { jwtSecret, email, pass } = require('../config');
 const db = require('../models');
 const User = db.User;
 
+//https://sandydev.medium.com/how-to-build-secure-and-scalable-authentication-system-with-node-js-and-mongodb-c50bf51c06b0
+
 module.exports = {
 	register: async (req, res) => {
 		try {

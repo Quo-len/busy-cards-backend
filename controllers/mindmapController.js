@@ -65,16 +65,13 @@ module.exports = {
 				.limit(limit)
 				.populate({
 					path: 'participants',
-					model: 'Participant',
 					populate: {
 						path: 'user',
-						model: 'User',
 						select: 'id username email avatar',
 					},
 				})
 				.populate({
 					path: 'owner',
-					model: 'User',
 					select: 'id username email avatar',
 				});
 

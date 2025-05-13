@@ -1,45 +1,18 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const Favorite = require('./Favorite'); // adjust path if needed
-const Participant = require('./Participant'); // adjust path if needed
+const Favorite = require('./Favorite');
+const Participant = require('./Participant');
 
-const mindmapSchema = new mongoose.Schema(
+const mindmapSchema = new Schema(
 	{
-		title: {
-			type: String,
-			default: 'Нова інтелект-карта без назви',
-			required: true,
-		},
-		description: {
-			default: 'Опис відсутній.',
-			type: String,
-		},
-		owner: {
-			type: Schema.Types.ObjectId,
-			ref: 'User',
-			required: true,
-		},
-		// Change from array to mixed object
-		nodes: {
-			type: Schema.Types.Mixed,
-			default: {},
-		},
-		// Change from array to mixed object
-		edges: {
-			type: Schema.Types.Mixed,
-			default: {},
-		},
-		isPublic: {
-			type: Boolean,
-			default: false,
-		},
+		title: { type: String, default: 'Нова інтелект-карта без назви', required: true },
+		description: { default: 'Опис відсутній.', type: String },
+		owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+		nodes: { type: Schema.Types.Mixed, default: {} },
+		edges: { type: Schema.Types.Mixed, default: {} },
+		isPublic: { type: Boolean, default: false },
 	},
-	{
-		toJSON: { virtuals: true },
-		toObject: { virtuals: true },
-		timestamps: true,
-		strict: false,
-	}
+	{ toJSON: { virtuals: true }, toObject: { virtuals: true }, timestamps: true, strict: false }
 );
 
 mindmapSchema.virtual('participants', {
