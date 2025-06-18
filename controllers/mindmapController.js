@@ -9,7 +9,6 @@ module.exports = {
 		try {
 			const page = parseInt(req.query.page) || 1;
 			const limit = parseInt(req.query.limit) || 10;
-			// lastModified, createdAt
 			const { owner, participant, sortBy = 'updatedAt', sortOrder = 'desc', isPublic, favorite } = req.query;
 
 			const sortOptions = {
@@ -123,6 +122,13 @@ module.exports = {
 	},
 	updateMindmap: async (req, res) => {
 		try {
+			const occupiedName = await Mindmap.findOne({
+				title: req.body.title,
+				_id: { $ne: req.params.id },
+			});
+			if (occupiedName) {
+				return res.status(409).json({ message: 'Проєкт з таким іменем вже зареєстровано.' });
+			}
 			const mindmap = await Mindmap.findByIdAndUpdate(req.params.id, req.body, { new: true });
 			if (!mindmap) {
 				return res.status(404).json({ error: 'Інтелект-карту не знайдено.' });

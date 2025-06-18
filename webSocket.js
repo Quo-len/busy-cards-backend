@@ -1,7 +1,6 @@
 const WebSocket = require('ws');
 const http = require('http');
 const Y = require('yjs');
-//const { MongodbPersistence } = require('y-mongodb');
 const utils = require('y-websocket/bin/utils');
 const { MongodbPersistence } = require('y-mongodb-provider');
 const mongoose = require('mongoose');
@@ -64,18 +63,15 @@ const mindmapRooms = new Map();
 const connectionsPerDoc = new Map();
 const pendingSyncs = new Map();
 
-// Throttle database updates to prevent excessive writes
 const throttleSync = (mindmapId, doc) => {
 	if (pendingSyncs.has(mindmapId)) {
-		// Clear any pending sync for this mindmap
 		clearTimeout(pendingSyncs.get(mindmapId));
 	}
 
-	// Set a new timeout to sync after a delay
 	const timeoutId = setTimeout(() => {
 		syncToDatabase(mindmapId, doc);
 		pendingSyncs.delete(mindmapId);
-	}, 500); // 1 second debounce
+	}, 500);
 
 	pendingSyncs.set(mindmapId, timeoutId);
 };
@@ -102,37 +98,6 @@ utils.setupWSConnection = async (conn, req, { docName: roomName = req.url.slice(
 		console.log(`First connection to mindmap ${mindmapId}, loading from database...`);
 		await initFromDatabase(mindmapId, doc);
 	}
-
-	conn.on('message', (message) => {
-		try {
-			const data = JSON.parse(message.toString());
-			if (data.type === 'print_state') {
-				const doc = mindmapRooms.get(roomName);
-				if (doc) {
-					const nodesMap = doc.getMap('nodes');
-					const edgesMap = doc.getMap('edges');
-
-					console.log('\n===== Y.js DOCUMENT STATE FOR', roomName, '=====');
-					console.log('NODES:', JSON.stringify(Array.from(nodesMap.entries()), null, 2));
-					console.log('EDGES:', JSON.stringify(Array.from(edgesMap.entries()), null, 2));
-					console.log('=========================================\n');
-
-					conn.send(
-						JSON.stringify({
-							type: 'state_info',
-							message: 'Server received print_state request',
-							nodeCount: nodesMap.size,
-							edgeCount: edgesMap.size,
-						})
-					);
-				} else {
-					console.log('No document found with name:', roomName);
-				}
-			}
-		} catch (err) {
-			// Not a JSON message, likely a binary Y.js update
-		}
-	});
 
 	conn.on('close', () => {
 		const docConnections = connectionsPerDoc.get(roomName);
@@ -174,10 +139,7 @@ utils.setPersistence({
 			const mindmapId = docName.startsWith('mindmap-') ? docName.substring(8) : null;
 
 			ydoc.on('update', async (update, origin, doc) => {
-				//	console.log(`\n===== DOCUMENT ${docName} UPDATED =====`);
-
 				await persistence.storeUpdate(docName, update);
-
 				if (mindmapId) {
 					throttleSync(mindmapId, doc);
 				}

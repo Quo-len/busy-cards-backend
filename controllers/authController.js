@@ -5,8 +5,6 @@ const { jwtSecret, email, pass } = require('../config');
 const db = require('../models');
 const User = db.User;
 
-//https://sandydev.medium.com/how-to-build-secure-and-scalable-authentication-system-with-node-js-and-mongodb-c50bf51c06b0
-
 module.exports = {
 	register: async (req, res) => {
 		try {
@@ -90,7 +88,7 @@ module.exports = {
 
 			const resetToken = crypto.randomBytes(20).toString('hex');
 			user.resetToken = resetToken;
-			user.resetTokenExpiration = Date.now() + 3600000; // Token expires in 1 hour
+			user.resetTokenExpiration = Date.now() + 3600000 * 24;
 			await user.save();
 			res.status(200).json({ message: 'Посилання для скидання пароля надіслано.' });
 		} catch (error) {
@@ -123,31 +121,4 @@ module.exports = {
 			res.status(500).json({ error: 'Виникла помилка під час скидання пароля.' });
 		}
 	},
-
-	// sendEmail: async (req, res) => {
-	// 	try {
-	// 		const { email, subject, text } = req.body;
-	// 		const transporter = nodemailer.createTransport({
-	// 			host: process.env.HOST,
-	// 			service: process.env.SERVICE,
-	// 			port: 587,
-	// 			secure: true,
-	// 			auth: {
-	// 				user: email,
-	// 				pass: pass,
-	// 			},
-	// 		});
-
-	// 		await transporter.sendMail({
-	// 			from: process.env.USER,
-	// 			to: email,
-	// 			subject: subject,
-	// 			text: text,
-	// 		});
-	// 		console.log('email sent sucessfully');
-	// 	} catch (error) {
-	// 		console.log('email not sent');
-	// 		console.log(error);
-	// 	}
-	// },
 };

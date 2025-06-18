@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const Favorite = require('./Favorite');
 const Participant = require('./Participant');
+const Invitation = require('./Invitation');
 
 const mindmapSchema = new Schema(
 	{
@@ -21,16 +22,19 @@ mindmapSchema.virtual('participants', {
 	foreignField: 'mindmap',
 });
 
-mindmapSchema.pre('findOneAndDelete', async function (next) {
+mindmapSchema.pre(['deleteOne', 'findOneAndDelete', 'findByIdAndDelete'], async function (next) {
 	try {
-		const doc = await this.model.findOne(this.getFilter());
-		if (doc) {
-			await Favorite.deleteMany({ mindmap: doc.id });
-			await Participant.deleteMany({ mindmap: doc.id });
-		}
+		const mindmapId = this.getQuery()._id;
+
+		await Participant.deleteMany({ mindmap: mindmapId });
+		await Invitation.deleteMany({ mindmap: mindmapId });
+		await Favorite.deleteMany({ mindmap: mindmapId });
+
+		console.log(`Cleaned up data for mindmap: ${mindmapId}`);
 		next();
-	} catch (err) {
-		next(err);
+	} catch (error) {
+		console.error('Error in Mindmap pre-delete middleware:', error);
+		next(error);
 	}
 });
 

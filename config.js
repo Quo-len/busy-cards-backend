@@ -6,8 +6,6 @@ if (result.error) {
 	throw result.error;
 }
 
-// console.log(result.parsed);
-
 module.exports = {
 	saltRounds: 2,
 	jwtSecret: process.env.SECRET,

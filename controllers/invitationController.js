@@ -8,7 +8,6 @@ module.exports = {
 		try {
 			const page = parseInt(req.query.page) || 1;
 			const limit = parseInt(req.query.limit) || 10;
-			// lastModified, createdAt
 			const { receiver, sender, status, sortBy = 'lastModified', sortOrder = 'desc' } = req.query;
 
 			const sortOptions = {

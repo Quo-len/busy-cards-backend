@@ -1,7 +1,6 @@
 const db = require('../models');
 const multer = require('multer');
 const fs = require('fs');
-const config = require('./../config');
 const path = require('path');
 
 const User = db.User;
@@ -26,7 +25,7 @@ const fileFilter = (req, file, cb) => {
 	if (extname && mimetype) {
 		return cb(null, true);
 	} else {
-		return cb(new Error('Only image files are allowed.'));
+		return cb(new Error('Дозволені тільки файли формату: jpeg|jpg|png|gif.'));
 	}
 };
 
